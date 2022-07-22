@@ -1,3 +1,7 @@
 {
-  "session_name": "userId"
+  "session_name": "userId",
+
+  "twt_callback_url": "http://127.0.0.1:4200/auth/twitter/callback",
+  "twt_success_url": "http://localhost:3000/auth/success",
+  "twt_failed_url": "http://localhost:3000/auth/failed"
 }

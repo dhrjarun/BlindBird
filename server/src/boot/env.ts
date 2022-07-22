@@ -11,6 +11,8 @@ const requiredEnv: string[] = [
   'REDIS_HOST',
   'REDIS_PWD',
   'REDIS_USERNAME',
+  'TWT_API_KEY',
+  'TWT_API_KEY_SECRET',
 ]
 
 const unsetEnv = requiredEnv.filter(

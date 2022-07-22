@@ -4,16 +4,20 @@ import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
 import express from 'express'
 import session from 'express-session'
+import passport from 'passport'
 import cookieParser from 'cookie-parser'
 import config from 'config'
 
+import authBoot from './boot/auth'
 import dbBoot from './boot/db'
 import redisBoot from './boot/redis'
 import { redis } from './redis'
 
+import { authRouter, LogoutResolver } from './modules/user'
 import { HelloWorldResolver } from './modules/hello-world/'
 
 async function main() {
+  authBoot()
   dbBoot()
   const RedisStore = redisBoot()
 
@@ -21,6 +25,7 @@ async function main() {
   const schema = await buildSchema({
     resolvers: [
       HelloWorldResolver,
+      LogoutResolver,
     ],
   })
   const apolloServer = new ApolloServer({
@@ -61,6 +66,9 @@ async function main() {
   //     },
   //   }),
   // )
+  app.use(passport.initialize())
+  app.use(passport.session())
+  app.use('/', authRouter)
 
   await apolloServer.start()
   apolloServer.applyMiddleware({
