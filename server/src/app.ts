@@ -11,13 +11,17 @@ import dbBoot from './boot/db'
 import redisBoot from './boot/redis'
 import { redis } from './redis'
 
+import { HelloWorldResolver } from './modules/hello-world/'
+
 async function main() {
   dbBoot()
   const RedisStore = redisBoot()
 
   const app = express()
   const schema = await buildSchema({
-    resolvers: [],
+    resolvers: [
+      HelloWorldResolver,
+    ],
   })
   const apolloServer = new ApolloServer({
     schema,
