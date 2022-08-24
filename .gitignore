@@ -7,3 +7,4 @@ node_modules/*
 yarn-error.log
 .env
 ./client/src/graphql
+server/schema.gql

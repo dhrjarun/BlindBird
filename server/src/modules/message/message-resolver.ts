@@ -114,7 +114,7 @@ export class MessageResolver {
 
   @Authorized()
   @Mutation((returns) => Boolean)
-  async makeSeen(@Arg('messageId') messageId: number, @Ctx() context: MyCtx) {
+  async markSeen(@Arg('messageId') messageId: number, @Ctx() context: MyCtx) {
     const result = await dataSource
       .createQueryBuilder()
       .update(Message)
