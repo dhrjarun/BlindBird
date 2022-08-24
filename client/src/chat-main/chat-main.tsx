@@ -6,6 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { LoadingChatBubble } from 'chat-bubble';
+import { ChatBubble } from 'chat-bubble/chat-bubble';
 import { Header } from 'chat-main/header';
 import { gqlClient } from 'gql-client';
 import {
@@ -22,7 +23,6 @@ import {
 import { getNewMessagesData } from 'query-utils';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Body } from './body';
 import { ChatInput } from './chat-input';
 import { ChatScrollApi, ChatScrollArea } from './chat-scroll-area';
 
@@ -186,8 +186,17 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
           {isFetchingPreviousPage && <Loader size="sm" />}
         </Box>
         {chat &&
-          data?.pages.map((msgs, index) => (
-            <Body key={'msgBody-' + index} sender={sender} messages={msgs} />
+          data?.pages.map((msgs, indexA) => (
+            <React.Fragment key={'msgBody-' + indexA}>
+              {msgs?.map((msg, indexB) => (
+                <ChatBubble
+                  key={msg.id}
+                  sender={sender}
+                  indices={[indexA, indexB]}
+                  message={msg}
+                />
+              ))}
+            </React.Fragment>
           ))}
         {loadingMsgs.map((text) => (
           <LoadingChatBubble key={text} text={text} />

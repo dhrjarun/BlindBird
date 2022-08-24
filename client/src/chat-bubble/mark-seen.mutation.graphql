@@ -1,0 +1,3 @@
+mutation MarkSeen($messageId: Float!) {
+  markSeen(messageId: $messageId)
+}

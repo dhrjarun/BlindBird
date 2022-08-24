@@ -1,4 +1,4 @@
-import { Box, Loader, Text } from '@mantine/core';
+import { Box, Loader } from '@mantine/core';
 import React from 'react';
 
 import { BubbleBase, BubbleBaseContainer } from './bubble-base';
