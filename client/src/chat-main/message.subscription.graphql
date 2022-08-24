@@ -1,0 +1,10 @@
+subscription NewMessage {
+  newMessage {
+    id
+    createdAt
+    isSeen
+    body
+    sender
+    chatId
+  }
+}

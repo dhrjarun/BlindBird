@@ -1,0 +1,18 @@
+query Chats {
+  chats {
+    id
+    createAt
+    firstPerson {
+      tUsername
+      tName
+      tId
+      tPfp
+    }
+    secondPerson {
+      tId
+      tUsername
+      tName
+      tPfp
+    }
+  }
+}

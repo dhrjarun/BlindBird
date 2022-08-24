@@ -1,0 +1,9 @@
+query Me {
+  me {
+    createAt
+    tId
+    tPfp
+    tUsername
+    tName
+  }
+}

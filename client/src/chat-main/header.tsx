@@ -2,10 +2,10 @@ import { ActionIcon, Avatar, Box, Group, MediaQuery, Text } from '@mantine/core'
 import React from 'react';
 import { ArrowLeft } from 'react-feather';
 
-export interface ChatAreaHeaderProps {
+export interface HeaderProps {
   onBack?: () => void;
 }
-export const ChatAreaHeader = React.forwardRef<HTMLHeadElement, ChatAreaHeaderProps>(
+export const Header = React.forwardRef<HTMLHeadElement, HeaderProps>(
   ({ onBack }, ref) => {
     return (
       <Box
@@ -33,4 +33,4 @@ export const ChatAreaHeader = React.forwardRef<HTMLHeadElement, ChatAreaHeaderPr
   },
 );
 
-ChatAreaHeader.displayName = 'ChatAreaHeader';
+Header.displayName = 'ChatMainHeader';

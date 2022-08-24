@@ -1,0 +1,14 @@
+query User($tUsername: String!) {
+  user(tUsername: $tUsername) {
+    createAt
+    tId
+    tPfp
+    tUsername
+    tName
+    publicMetrics {
+      followersCount
+      followingCount
+    }
+    isRegistered
+  }
+}

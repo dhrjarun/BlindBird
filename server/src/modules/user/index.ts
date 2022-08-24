@@ -1,2 +1,2 @@
 export { default as authRouter } from './auth'
-export * from './logout-resolver'
+export * from './user-resolver'

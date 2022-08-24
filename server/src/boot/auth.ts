@@ -2,6 +2,7 @@ import passport from 'passport'
 import passportTwitter from 'passport-twitter'
 import User from '../entity/User'
 import config from 'config'
+import dataSource from '../data-source'
 
 const Strategy = passportTwitter.Strategy
 
@@ -14,28 +15,19 @@ export default () => {
         callbackURL: config.get('twt_callback_url'),
       },
       async (token, tokenSecret, profile, cb) => {
-        const { displayName, username, photos, emails } = profile
-        let email: string | undefined
-        let photo: string | undefined
-        if (emails) email = emails[0].value
-        if (photos) photo = photos[0].value
+        const { id } = profile
 
         let user
 
         try {
-          user = await User.findOne({ where: { username } })
+          user = await User.findOne({ where: { tId: id } })
           if (!user) {
-            user = await User.create({
-              name: displayName,
-              username,
-              email,
-              photo,
-            }).save()
+            user = await User.create({ tId: id }).save()
           }
         } catch (err) {
           cb(err)
         }
-        cb(null, { id: user?.id, username: user?.username })
+        cb(null, { id: user?.id, tId: user?.tId })
       },
     ),
   )

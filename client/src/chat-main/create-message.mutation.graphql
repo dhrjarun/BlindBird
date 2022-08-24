@@ -1,0 +1,9 @@
+mutation CreateMessage($body: String!, $chatId: Float!) {
+  createMessage(body: $body, chatId: $chatId) {
+    id
+    createdAt
+    isSeen
+    body
+    sender
+  }
+}

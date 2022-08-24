@@ -1,0 +1,10 @@
+query Messages($chatId: Float!, $limit: Float, $cursorType: CursorType, $cursor: Float) {
+  messages(chatId: $chatId, limit: $limit, cursorType: $cursorType, cursor: $cursor) {
+    id
+    createdAt
+    isSeen
+    body
+    chatId
+    sender
+  }
+}
