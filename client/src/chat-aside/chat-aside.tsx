@@ -11,7 +11,7 @@ export interface ChatAsideProps {
   onActiveChatChange: (chat: Chat) => void;
 }
 export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
-  ({ activeChat, onActiveChatChange, ...rest }) => {
+  ({ activeChat, onActiveChatChange, ...rest }, ref) => {
     const fetchChats = async () => {
       const { chats } = await gqlClient.request<ChatsQuery>(ChatsDocument);
       return chats;
@@ -24,7 +24,7 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
     if (isError) return <ScrollArea {...getScrollAreaProps(rest)}>error</ScrollArea>;
 
     return (
-      <ScrollArea {...getScrollAreaProps(rest)}>
+      <ScrollArea viewportRef={ref} {...getScrollAreaProps(rest)}>
         {chats?.map((chat) => (
           <Item
             isActive={chat.id === activeChat?.id}

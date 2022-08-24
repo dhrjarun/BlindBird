@@ -4,11 +4,12 @@ import React from 'react';
 import { MyChatBubble, YourChatBubble } from '../chat-bubble';
 
 export interface BodyProps {
-  messages: MessagesQuery['messages'];
+  messages: MessagesQuery['messages'] | undefined;
   sender: Sender;
 }
 
 export const Body: React.FC<BodyProps> = ({ messages, sender }) => {
+  if (!messages) return null;
   return (
     <>
       {messages.map((msg: Message) => {

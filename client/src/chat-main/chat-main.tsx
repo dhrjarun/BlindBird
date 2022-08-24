@@ -20,16 +20,27 @@ import {
   Sender,
 } from 'graphql/generated';
 import { getNewMessagesData } from 'query-utils';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Body } from './body';
 import { ChatInput } from './chat-input';
+import { ChatScrollApi, ChatScrollArea } from './chat-scroll-area';
 
 export interface ChatMainProps {
   chat: Chat | null;
   onEmptyChat: () => void;
 }
 export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }) => {
+  const scrollApiRef = useRef<ChatScrollApi>();
+  const prevStateRef = useRef<{
+    isLoading: boolean;
+    isFetchingPreviousPage: boolean;
+    pagesLength: number;
+    lastPageLength: number;
+    firstPageLength: number;
+    loadingMsgsLength: number;
+  }>();
+
   const fetchMessages = useCallback(
     async ({
       pageParam = {},
@@ -54,7 +65,7 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
 
   const sender = chat?.firstPerson ? Sender.FirstPerson : Sender.SecondPerson;
 
-  const { data, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } =
+  const { data, isLoading, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } =
     useInfiniteQuery(['messages', chat?.id], fetchMessages, {
       getNextPageParam: (lastPage) => ({ cursor: lastPage?.at(-1)?.id }),
       getPreviousPageParam: (firstPage = []) => {
@@ -62,6 +73,13 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
         return { cursor: firstPage?.at(0)?.id };
       },
     });
+
+  // this will put the scroll to bottom at start
+  useEffect(() => {
+    if (!isLoading) {
+      scrollApiRef.current?.scrollToBottom();
+    }
+  }, [chat, isLoading]);
 
   const createMessgeRequest = async ({
     chatId,
@@ -96,24 +114,42 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
   const handleCreateMessage = (text: string) => {
     if (!chat) return;
     setLoadingMsgs([...loadingMsgs, text]);
+    scrollApiRef.current?.scrollToBottom('smooth');
     createMsgMutation.mutate({ body: text, chatId: chat.id });
   };
 
-  const observer = useRef<IntersectionObserver>();
+  useEffect(() => {
+    const prevState = prevStateRef.current;
+    const scrollApi = scrollApiRef.current;
 
-  const observerElm = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver(async (entries) => {
-        if (entries[0].isIntersecting) {
-          console.log('intersecting');
-          if (hasPreviousPage) fetchPreviousPage();
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [chat, hasPreviousPage],
-  );
+    if (
+      prevState &&
+      scrollApi &&
+      (prevState.lastPageLength !== data?.pages[data?.pages.length - 1]?.length ||
+        data?.pages[data?.pages.length - 1]?.length == 1) &&
+      scrollApi.snapshot().wasScrollToBottom
+    ) {
+      scrollApi.scrollToBottom('smooth');
+    } else if (
+      prevState &&
+      scrollApi &&
+      prevState.isFetchingPreviousPage &&
+      hasPreviousPage
+    ) {
+      scrollApi.scrollToMatch();
+    }
+  }, [data, hasPreviousPage, loadingMsgs]);
+
+  useEffect(() => {
+    prevStateRef.current = {
+      isLoading,
+      isFetchingPreviousPage,
+      pagesLength: data?.pages.length || 0,
+      firstPageLength: data?.pages[0]?.length || 0,
+      lastPageLength: data?.pages[data?.pages.length - 1]?.length || 0,
+      loadingMsgsLength: loadingMsgs.length || 0,
+    };
+  }, [data, isLoading, isFetchingPreviousPage, loadingMsgs]);
 
   return (
     <Box
@@ -132,44 +168,34 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
       {...rest}
     >
       {chat && <Header onBack={onEmptyChat} />}
-      <Box
-        sx={(theme) => ({
-          paddingInline: theme.spacing.md,
-          paddingBlock: theme.spacing.sm,
-          overflowY: 'scroll',
-          display: 'flex',
-          flexDirection: 'column',
-        })}
+      <ChatScrollArea
+        getChatScrollApi={(api) => {
+          scrollApiRef.current = api;
+        }}
+        onReachingLoadingThreshold={() => {
+          if (hasPreviousPage) fetchPreviousPage();
+        }}
       >
         <Box
-          ref={observerElm}
           sx={(theme) => ({
             display: 'flex',
             justifyContent: 'center',
-            paddingBottom: theme.spacing.lg,
+            paddingBlock: theme.spacing.lg,
           })}
-          className="observer"
         >
           {isFetchingPreviousPage && <Loader size="sm" />}
         </Box>
         {chat &&
-          data?.pages.map((data) => (
-            <Body key={data[0]?.id} sender={sender} messages={data} />
+          data?.pages.map((msgs, index) => (
+            <Body key={'msgBody-' + index} sender={sender} messages={msgs} />
           ))}
         {loadingMsgs.map((text) => (
           <LoadingChatBubble key={text} text={text} />
         ))}
-      </Box>
+      </ChatScrollArea>
       {chat && <ChatInput onSubmit={handleCreateMessage} />}
     </Box>
   );
-};
-
-const getAfterCursor = (data: InfiniteData<Message[]>): number => {
-  const lastPage = data.pages[data.pages.length - 1];
-  const lastMessage = lastPage[lastPage.length - 1];
-
-  return lastMessage.id;
 };
 
 ChatMain.displayName = 'ChatMain';
