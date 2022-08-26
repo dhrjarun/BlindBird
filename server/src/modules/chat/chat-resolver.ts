@@ -40,7 +40,7 @@ export class ChatResolver {
   @Query((returns) => [Chat])
   @Authorized()
   async chats(@Ctx() context: MyCtx) {
-    const chat = await dataSource
+    return await dataSource
       .createQueryBuilder(Chat, 'chat')
       .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
       .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
@@ -48,10 +48,27 @@ export class ChatResolver {
         id: context.req.user!.id,
       })
       .getMany()
-
-    return chat
   }
 
+  @Query((returns) => Chat)
+  @Authorized()
+  async chat(@Arg('id') id: number, @Ctx() context: MyCtx) {
+    return await dataSource
+      .createQueryBuilder(Chat, 'chat')
+      .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
+      .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
+      .where(
+        'chat.id = :chatId AND (chat.firstPerson.id = :userId OR chat.secondPerson.id = :userId)',
+        {
+          userId: context.req.user!.id,
+          chatId: id,
+        },
+      )
+      .select(['chat', 'firstPerson', 'secondPerson'])
+      .getOne()
+  }
+
+  @Authorized()
   @Query((returns) => [Chat])
   async chatsWithUnreadMsgs(@Ctx() context: MyCtx): Promise<Chat[]> {
     return await dataSource
