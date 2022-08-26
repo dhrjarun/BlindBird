@@ -2,6 +2,7 @@ import { Resolver, Mutation, Query, Arg, Ctx, Authorized } from 'type-graphql'
 import Chat from '../../entity/Chat'
 import User from '../../entity/User'
 import dataSource from '../../data-source'
+import { Sender } from '../../entity/Message'
 
 @Resolver()
 export class ChatResolver {
@@ -49,5 +50,26 @@ export class ChatResolver {
       .getMany()
 
     return chat
+  }
+
+  @Query((returns) => [Chat])
+  async chatsWithUnreadMsgs(@Ctx() context: MyCtx): Promise<Chat[]> {
+    return await dataSource
+      .createQueryBuilder(Chat, 'chat')
+      .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
+      .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
+      .leftJoinAndSelect(
+        'chat.messages',
+        'message',
+        'message.isSeen = false AND ((chat.firstPerson.id = :userId AND message.sender = :sP) OR (chat.secondPerson.id = :userId AND message.sender = :fP))',
+        {
+          userId: context.req.user?.id,
+          fP: Sender.FIRST_PERSON,
+          sP: Sender.SECOND_PERSON,
+        },
+      )
+      .select(['chat', 'firstPerson', 'secondPerson', 'message'])
+      .orderBy({ 'message.createdAt': 'DESC' })
+      .getMany()
   }
 }

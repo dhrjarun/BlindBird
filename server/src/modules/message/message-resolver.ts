@@ -116,10 +116,10 @@ export class MessageResolver {
   @Mutation((returns) => Boolean)
   async markSeen(@Arg('messageId') messageId: number, @Ctx() context: MyCtx) {
     const result = await dataSource
-      .createQueryBuilder()
+      .createQueryBuilder(Message, 'message')
       .update(Message)
       .set({ isSeen: true })
-      .where('id = :messageId', { messageId })
+      .where('message.id = :messageId', { messageId })
       .execute()
     if (result.affected === 1) return true
     return false

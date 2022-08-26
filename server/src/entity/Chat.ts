@@ -32,6 +32,7 @@ export default class Chat extends BaseEntity {
   @Column('boolean', { default: false })
   revealGender: boolean
 
+  @Field(() => [Message], { nullable: true })
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[]
 

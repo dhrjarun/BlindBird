@@ -6,7 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm'
-import { ObjectType, Field, Ctx } from 'type-graphql'
+import { ObjectType, Field, Ctx, createUnionType } from 'type-graphql'
 import Chat from './Chat'
 
 import { registerEnumType } from 'type-graphql'
