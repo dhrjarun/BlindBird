@@ -5,8 +5,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { LoadingChatBubble } from 'chat-bubble';
-import { ChatBubble } from 'chat-bubble/chat-bubble';
+import { ChatBubble, LoadingChatBubble } from 'chat-bubble';
 import { Header } from 'chat-main/header';
 import { gqlClient } from 'gql-client';
 import {
@@ -113,8 +112,8 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
 
   const handleCreateMessage = (text: string) => {
     if (!chat) return;
+    scrollApiRef.current?.scrollToBottom();
     setLoadingMsgs([...loadingMsgs, text]);
-    scrollApiRef.current?.scrollToBottom('smooth');
     createMsgMutation.mutate({ body: text, chatId: chat.id });
   };
 
@@ -167,7 +166,7 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
       })}
       {...rest}
     >
-      {chat && <Header onBack={onEmptyChat} />}
+      <Header onBack={onEmptyChat} chat={chat} />
       <ChatScrollArea
         getChatScrollApi={(api) => {
           scrollApiRef.current = api;
