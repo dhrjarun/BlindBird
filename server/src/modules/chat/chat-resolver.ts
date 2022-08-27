@@ -50,9 +50,12 @@ export class ChatResolver {
       .getMany()
   }
 
-  @Query((returns) => Chat)
+  @Query((returns) => Chat, { nullable: true })
   @Authorized()
-  async chat(@Arg('id') id: number, @Ctx() context: MyCtx) {
+  async chat(
+    @Arg('id') id: number,
+    @Ctx() context: MyCtx,
+  ): Promise<Chat | null> {
     return await dataSource
       .createQueryBuilder(Chat, 'chat')
       .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
@@ -88,5 +91,33 @@ export class ChatResolver {
       .select(['chat', 'firstPerson', 'secondPerson', 'message'])
       .orderBy({ 'message.createdAt': 'DESC' })
       .getMany()
+  }
+
+  @Authorized()
+  @Query((returns) => Chat, { nullable: true })
+  async chatWithUnreadMsgs(
+    @Arg('id') id: number,
+    @Ctx() context: MyCtx,
+  ): Promise<Chat | null> {
+    return await dataSource
+      .createQueryBuilder(Chat, 'chat')
+      .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
+      .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
+      .leftJoinAndSelect(
+        'chat.messages',
+        'message',
+        'message.isSeen = false AND ((chat.firstPerson.id = :userId AND message.sender = :sP) OR (chat.secondPerson.id = :userId AND message.sender = :fP))',
+        {
+          userId: context.req.user?.id,
+          fP: Sender.FIRST_PERSON,
+          sP: Sender.SECOND_PERSON,
+        },
+      )
+      .where('chat.id = :chatId', {
+        chatId: id,
+      })
+      .select(['chat', 'firstPerson', 'secondPerson', 'message'])
+      .orderBy({ 'message.createdAt': 'DESC' })
+      .getOne()
   }
 }
