@@ -1,7 +1,5 @@
 import { Avatar, AvatarProps, Menu } from '@mantine/core';
-import { useMutation } from '@tanstack/react-query';
-import { gqlClient } from 'gql-client';
-import { LogoutDocument, LogoutMutation } from 'graphql/generated';
+import { LOGOUT_URL } from 'constants/api';
 import React from 'react';
 import { LogOut } from 'react-feather';
 import { userUserCtx } from 'user-ctx';
@@ -10,17 +8,12 @@ export interface UserAvatarProps extends AvatarProps {}
 export const UserAvatar = React.forwardRef<HTMLDivElement, UserAvatarProps>(
   (props, ref) => {
     const user = userUserCtx();
-
-    const logoutRequest = async () => {
-      const { logout } = await gqlClient.request<LogoutMutation>(LogoutDocument);
-      return logout;
-    };
-
-    const logoutMutation = useMutation(logoutRequest);
+    if (!user) return null;
 
     const handleLogout = () => {
-      logoutMutation.mutate();
-      window.open('/', '_self');
+      fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' }).finally(() => {
+        window.open('/', '_self');
+      });
     };
 
     return (
