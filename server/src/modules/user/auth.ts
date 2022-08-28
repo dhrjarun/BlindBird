@@ -8,7 +8,6 @@ router.get(
   '/auth/twitter',
   (req, res, next) => {
     ;(req.session as any).continueUrl = req.query.continueUrl
-    console.log('session log 1', (req.session as any).continueUrl)
     next()
   },
   passport.authenticate('twitter'),
@@ -16,15 +15,17 @@ router.get(
 
 router.get(
   '/auth/twitter/callback',
+  (req, res, next) => {
+    ;(req as any).continueUrl = (req.session as any).continueUrl
+    next()
+  },
   passport.authenticate('twitter', {
     failureRedirect: config.get<string>('twt_failed_url'),
-    // successRedirect: config.get<string>('twt_success_url'),
   }),
   (req, res) => {
     const redirectUrl =
-      (req.session as any).continueUrl || config.get<string>('twt_success_url')
+      (req as any).continueUrl || config.get<string>('twt_success_url')
 
-    ;(req.session as any).continueUrl = ''
     res.redirect(redirectUrl)
   },
 )

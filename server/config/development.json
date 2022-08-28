@@ -3,5 +3,6 @@
 
   "twt_callback_url": "http://localhost:3100/auth/twitter/callback",
   "twt_success_url": "http://localhost:3000",
-  "twt_failed_url": "http://localhost:3000"
+  "twt_failed_url": "http://localhost:3000",
+  "client_url": "http://localhost:3000"
 }

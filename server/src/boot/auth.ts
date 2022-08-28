@@ -2,7 +2,6 @@ import passport from 'passport'
 import passportTwitter from 'passport-twitter'
 import User from '../entity/User'
 import config from 'config'
-import dataSource from '../data-source'
 
 const Strategy = passportTwitter.Strategy
 
