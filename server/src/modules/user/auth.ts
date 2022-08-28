@@ -1,6 +1,7 @@
 import express from 'express'
 import passport from 'passport'
 import config from 'config'
+import { logout } from './logout'
 
 const router = express.Router()
 
@@ -34,15 +35,8 @@ router.get('/check-user', function (req, res) {
   res.send(req.user)
 })
 
-router.get('/logout', function (req, res) {
-  req.logout((err) => {
-    if (err) {
-      res.send(false)
-    } else {
-      res.clearCookie('userId')
-      res.send(true)
-    }
-  })
+router.post('/logout', function (req, res) {
+  logout(req, res).finally(() => res.redirect('/'))
 })
 
 export default router
