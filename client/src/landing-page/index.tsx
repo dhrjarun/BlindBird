@@ -10,23 +10,19 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { TWT_REGISTER } from 'constants/api';
 import { DHRJ_GITHUB, DHRJ_TWITTER, GITHUB_REPO } from 'constants/links';
 import { BASE, CHAT_PLACE, TWT_PROFILES } from 'constants/routes';
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import { AtSign, Twitter } from 'react-feather';
 import { Link, useNavigate } from 'react-router-dom';
+import { RegisterButton } from 'register-button';
 import { UserAvatar } from 'user-avatar';
 import { userUserCtx } from 'user-ctx';
 
 export function LandingPage() {
   const user = userUserCtx();
   const navigate = useNavigate();
-
-  const handleRegister = () => {
-    window.open(TWT_REGISTER, '_self');
-  };
 
   return (
     <Container
@@ -52,13 +48,10 @@ export function LandingPage() {
         >
           🕊
         </Text>
-        {!user ? (
-          <Button radius="xs" onClick={handleRegister} size="sm">
-            Register
-          </Button>
-        ) : (
-          <UserAvatar />
-        )}
+        <RegisterButton size="sm" radius="xs">
+          Register
+        </RegisterButton>
+        <UserAvatar />
       </Box>
       <Box component="main" sx={{ alignSelf: 'center', paddingBottom: '4rem' }}>
         <Title

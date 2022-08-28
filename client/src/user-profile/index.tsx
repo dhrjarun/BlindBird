@@ -1,12 +1,11 @@
 import { Alert, Avatar, Box, Button, Group, Skeleton, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { TWT_REGISTER } from 'constants/api';
-import { BASE, TWT_PROFILES } from 'constants/routes';
 import { gqlClient } from 'gql-client';
 import { UserDocument, UserQuery } from 'graphql/generated';
 import React from 'react';
 import { Info } from 'react-feather';
 import { useParams } from 'react-router-dom';
+import { RegisterButton } from 'register-button';
 import { userUserCtx } from 'user-ctx';
 
 import { TWT_ABOUT_US_LINK } from '../constants/links';
@@ -24,13 +23,6 @@ export function UserProfile() {
   };
 
   const { data, isLoading, isError } = useQuery(['user', username], fetchUser, {});
-
-  const handleRegister = () => {
-    window.open(
-      `${TWT_REGISTER}?continueUrl=${BASE}/${TWT_PROFILES}/${data?.tUsername}`,
-      '_self',
-    );
-  };
 
   if (isError)
     return (
@@ -155,7 +147,7 @@ export function UserProfile() {
               marginTop: theme.spacing.md,
             })}
           >
-            {!user && <Button onClick={handleRegister}>Register</Button>}
+            <RegisterButton>Register</RegisterButton>
             {user && !data?.isRegistered && (
               <Button
                 component="a"
