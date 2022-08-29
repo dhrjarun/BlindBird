@@ -8,23 +8,13 @@ import { getNewMessagesData } from '../utils';
 import { fetchChatWithUnreadMsgs } from './../requests';
 
 type ChatsWithUnreadMsgs = ChatsWithUnreadMsgsQuery['chatsWithUnreadMsgs'];
+type ChatWithUnreadMsg = ChatWithUnreadMsgsQuery['chatWithUnreadMsgs'];
 
 export const useChatApi = () => {
   const queryClient = useQueryClient();
 
   const getChatsWithUnreadMsg = () => {
     return queryClient.getQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg);
-  };
-
-  const addNewChat = (chat: ChatWithUnreadMsgsQuery['chatWithUnreadMsgs']) => {
-    if (!chat) return;
-
-    queryClient.setQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg, (data) => {
-      if (data) {
-        return [chat, ...data] as any;
-      }
-      return [chat];
-    });
   };
 
   const getChatIndex = (id: number) => {
@@ -39,9 +29,10 @@ export const useChatApi = () => {
     if (chatIndex === null || chatIndex === undefined) return false;
 
     queryClient.setQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg, (data) => {
+      console.log('from addMsgInChatIfExistSet', data);
       if (!data) return data;
 
-      if (chatIndex) {
+      if (chatIndex !== null || chatIndex !== undefined) {
         const newData = produce(data, (draft) => {
           if (!draft[chatIndex!].messages) draft[chatIndex!].messages = [];
           draft[chatIndex!].messages?.push(message);
@@ -53,6 +44,26 @@ export const useChatApi = () => {
     return true;
   };
 
+  const addNewChat = (chat: ChatWithUnreadMsg) => {
+    if (!chat) return;
+
+    queryClient.setQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg, (data) => {
+      if (data) {
+        return [chat, ...data] as any;
+      }
+      return [chat];
+    });
+  };
+
+  const addMessageInChat = async (chatId: number, newMessage: Message) => {
+    const isDone = addMsgInChatIfExist(chatId, newMessage);
+
+    if (!isDone) {
+      const chat = await fetchChatWithUnreadMsgs(chatId);
+      if (chat) addNewChat(chat as ChatWithUnreadMsg);
+    }
+  };
+
   const addMsgInMessagesIfExist = (chatId: number, newMessage: Message) => {
     queryClient.setQueryData<InfiniteData<Message[]>>(
       chatKeys.messages(chatId),
@@ -61,15 +72,6 @@ export const useChatApi = () => {
         return getNewMessagesData(data, newMessage);
       },
     );
-  };
-
-  const addMessageInChat = async (chatId: number, newMessage: Message) => {
-    const isDone = addMsgInChatIfExist(chatId, newMessage);
-
-    if (!isDone) {
-      const chat = await fetchChatWithUnreadMsgs(chatId);
-      addNewChat(chat);
-    }
   };
 
   const removeMsgFromChat = async (chatIndex: number, messageId: number) => {
