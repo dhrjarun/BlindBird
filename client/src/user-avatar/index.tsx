@@ -24,6 +24,7 @@ export const UserAvatar = React.forwardRef<HTMLDivElement, UserAvatarProps>(
           </Avatar>
         </Menu.Target>
         <Menu.Dropdown>
+          <Menu.Label>@{user.tUsername}</Menu.Label>
           <Menu.Item onClick={handleLogout} icon={<LogOut size={12} />}>
             Logout
           </Menu.Item>

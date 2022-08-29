@@ -115,19 +115,6 @@ export function LandingPage() {
             Go to Chat
           </Button>
 
-          {user && (
-            <Button
-              compact
-              component="a"
-              size="sm"
-              variant="subtle"
-              href={`http://twitter.com/${user?.tUsername}`}
-              target="_blank"
-            >
-              <Twitter fill="currentColor" size={16} />
-              &nbsp;{user?.tUsername}
-            </Button>
-          )}
           <CopyButton timeout={20000} value={`${BASE}${TWT_PROFILES}/${user?.tUsername}`}>
             {({ copied, copy }) => (
               <Button
@@ -137,7 +124,7 @@ export function LandingPage() {
                 color={copied ? 'green' : ''}
                 variant={copied ? 'light' : 'subtle'}
               >
-                Copy Chat Link
+                Copy Blind Link
               </Button>
             )}
           </CopyButton>
