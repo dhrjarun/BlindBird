@@ -2,12 +2,12 @@ import { Avatar, AvatarProps, Menu } from '@mantine/core';
 import { LOGOUT_URL } from 'constants/api';
 import React from 'react';
 import { LogOut } from 'react-feather';
-import { userUserCtx } from 'user-ctx';
+import { useUserCtx } from 'user-ctx';
 
 export interface UserAvatarProps extends AvatarProps {}
 export const UserAvatar = React.forwardRef<HTMLDivElement, UserAvatarProps>(
   (props, ref) => {
-    const user = userUserCtx();
+    const user = useUserCtx();
     if (!user) return null;
 
     const handleLogout = () => {

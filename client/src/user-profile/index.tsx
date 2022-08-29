@@ -6,12 +6,12 @@ import React from 'react';
 import { Info } from 'react-feather';
 import { useParams } from 'react-router-dom';
 import { RegisterButton } from 'register-button';
-import { userUserCtx } from 'user-ctx';
+import { useUserCtx } from 'user-ctx';
 
 import { TWT_ABOUT_US_LINK } from '../constants/links';
 
 export function UserProfile() {
-  const user = userUserCtx();
+  const user = useUserCtx();
 
   const { username } = useParams<{ username: string }>();
 

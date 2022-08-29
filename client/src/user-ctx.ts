@@ -8,6 +8,6 @@ export const UserCtx = React.createContext<User | null>(null);
 
 export const UserProvider = UserCtx.Provider;
 
-export const userUserCtx = () => {
+export const useUserCtx = () => {
   return useContext(UserCtx);
 };

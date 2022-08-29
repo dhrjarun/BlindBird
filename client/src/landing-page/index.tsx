@@ -19,10 +19,10 @@ import { AtSign, Twitter } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import { RegisterButton } from 'register-button';
 import { UserAvatar } from 'user-avatar';
-import { userUserCtx } from 'user-ctx';
+import { useUserCtx } from 'user-ctx';
 
 export function LandingPage() {
-  const user = userUserCtx();
+  const user = useUserCtx();
   const navigate = useNavigate();
 
   return (
