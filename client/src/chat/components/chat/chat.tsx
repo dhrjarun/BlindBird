@@ -57,7 +57,7 @@ export function Chat() {
             />
           </Box>
           <ChatFeed
-            chatIndex={activeChatData?.chatIndex || 0}
+            chatIndex={activeChatData?.chatIndex ?? -1}
             chat={activeChatData?.chat || null}
             onEmptyChat={handleEmptyChat}
           />

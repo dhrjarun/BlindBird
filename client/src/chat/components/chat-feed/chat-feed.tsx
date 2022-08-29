@@ -13,7 +13,12 @@ export interface ChatFeedProps {
   chatIndex: number;
   onEmptyChat: () => void;
 }
-export const ChatFeed: React.FC<ChatFeedProps> = ({ chat, onEmptyChat, ...rest }) => {
+export const ChatFeed: React.FC<ChatFeedProps> = ({
+  chat,
+  chatIndex,
+  onEmptyChat,
+  ...rest
+}) => {
   const scrollApiRef = useRef<ChatScrollApi>();
   const prevStateRef = useRef<{
     isLoading: boolean;
@@ -139,7 +144,7 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ chat, onEmptyChat, ...rest }
               {msgs?.map((msg, indexB) => (
                 <MessageBubble
                   chatId={chat.id}
-                  chatIndex={chat.id}
+                  chatIndex={chatIndex}
                   key={msg.id}
                   sender={sender}
                   indices={[indexA, indexB]}

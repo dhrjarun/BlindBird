@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ChatProvider value={{ activeChat: null, activeChatIndex: -1 }}>
+      <ChatProvider>
         <App />
         <ReactQueryDevtools />
       </ChatProvider>

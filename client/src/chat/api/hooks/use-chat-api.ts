@@ -29,7 +29,6 @@ export const useChatApi = () => {
     if (chatIndex === null || chatIndex === undefined) return false;
 
     queryClient.setQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg, (data) => {
-      console.log('from addMsgInChatIfExistSet', data);
       if (!data) return data;
 
       if (chatIndex !== null || chatIndex !== undefined) {
