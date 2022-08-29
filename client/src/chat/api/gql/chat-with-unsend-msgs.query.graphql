@@ -1,0 +1,23 @@
+query ChatWithUnreadMsgs($chatId: Float!) {
+  chatWithUnreadMsgs(id: $chatId) {
+    id
+    name
+    createAt
+    revealGender
+    firstPerson {
+      tUsername
+      tName
+      tId
+      tPfp
+    }
+    secondPerson {
+      tUsername
+      tName
+      tId
+      tPfp
+    }
+    messages {
+      id
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { InfiniteData, QueryClient } from '@tanstack/react-query';
+import { InfiniteData } from '@tanstack/react-query';
 import { CursorType, Message } from 'graphql/generated';
 import produce from 'immer';
 

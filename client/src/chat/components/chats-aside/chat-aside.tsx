@@ -1,23 +1,18 @@
 import { ScrollArea, ScrollAreaProps } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
-import { gqlClient } from 'gql-client';
-import { Chat, ChatsDocument, ChatsQuery } from 'graphql/generated';
+import { Chat } from 'graphql/generated';
 import React from 'react';
 
+import { useChatsWithUnreadMsgsQuery } from '../../api';
+import { ChatData } from '../chat';
 import { Item } from './item';
 
 export interface ChatAsideProps {
   activeChat: Chat | null;
-  onActiveChatChange: (chat: Chat) => void;
+  onActiveChatChange: (chat: ChatData) => void;
 }
 export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
   ({ activeChat, onActiveChatChange, ...rest }, ref) => {
-    const fetchChats = async () => {
-      const { chats } = await gqlClient.request<ChatsQuery>(ChatsDocument);
-      return chats;
-    };
-
-    const { data: chats, isLoading, isError } = useQuery(['chats'], fetchChats);
+    const { data: chats, isLoading, isError } = useChatsWithUnreadMsgsQuery();
 
     if (isLoading || !chats)
       return <ScrollArea {...getScrollAreaProps(rest)}>loading</ScrollArea>;
@@ -25,14 +20,14 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
 
     return (
       <ScrollArea viewportRef={ref} {...getScrollAreaProps(rest)}>
-        {chats?.map((chat) => (
+        {chats?.map((chat, index) => (
           <Item
             isActive={chat.id === activeChat?.id}
             key={chat.id}
             name={chat?.firstPerson ? chat.secondPerson.tName : `unknown #${chat.id}`}
             pfp={chat?.firstPerson ? chat.secondPerson.tPfp : null}
             onClick={() => {
-              onActiveChatChange(chat as Chat);
+              onActiveChatChange({ chat: chat as Chat, chatIndex: index });
             }}
           />
         ))}

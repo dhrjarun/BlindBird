@@ -1,0 +1,21 @@
+query ChatsWithUnreadMsgs {
+  chatsWithUnreadMsgs {
+    id
+    name
+    createAt
+    revealGender
+    messages {
+      id
+    }
+    firstPerson {
+      tId
+      tName
+    }
+    secondPerson {
+      tId
+      tName
+      tUsername
+      tPfp
+    }
+  }
+}

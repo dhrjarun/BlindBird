@@ -19,6 +19,7 @@ export type Chat = {
   createAt: Scalars['DateTime'];
   firstPerson?: Maybe<User>;
   id: Scalars['Float'];
+  messages?: Maybe<Array<Message>>;
   name: Scalars['String'];
   revealGender: Scalars['Boolean'];
   secondPerson: User;
@@ -43,7 +44,6 @@ export type Mutation = {
   __typename?: 'Mutation';
   createChat: Chat;
   createMessage: Message;
-  logout: Scalars['Boolean'];
   markSeen: Scalars['Boolean'];
 };
 
@@ -75,11 +75,24 @@ export type PublicMetrics = {
 
 export type Query = {
   __typename?: 'Query';
+  chat?: Maybe<Chat>;
+  chatWithUnreadMsgs?: Maybe<Chat>;
   chats: Array<Chat>;
+  chatsWithUnreadMsgs: Array<Chat>;
   hello: Scalars['String'];
   me: User;
   messages: Array<Message>;
   user?: Maybe<User>;
+};
+
+
+export type QueryChatArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryChatWithUnreadMsgsArgs = {
+  id: Scalars['Float'];
 };
 
 
@@ -116,17 +129,29 @@ export type User = {
   tUsername: Scalars['String'];
 };
 
+export type ChatWithUnreadMsgsQueryVariables = Exact<{
+  chatId: Scalars['Float'];
+}>;
+
+
+export type ChatWithUnreadMsgsQuery = { __typename?: 'Query', chatWithUnreadMsgs?: { __typename?: 'Chat', id: number, name: string, createAt: any, revealGender: boolean, firstPerson?: { __typename?: 'User', tUsername: string, tName: string, tId: string, tPfp?: string | null } | null, secondPerson: { __typename?: 'User', tUsername: string, tName: string, tId: string, tPfp?: string | null }, messages?: Array<{ __typename?: 'Message', id: number }> | null } | null };
+
+export type ChatQueryVariables = Exact<{
+  chatId: Scalars['Float'];
+}>;
+
+
+export type ChatQuery = { __typename?: 'Query', chat?: { __typename?: 'Chat', id: number, createAt: any, firstPerson?: { __typename?: 'User', tUsername: string, tName: string, tId: string, tPfp?: string | null } | null, secondPerson: { __typename?: 'User', tId: string, tUsername: string, tName: string, tPfp?: string | null } } | null };
+
+export type ChatsWithUnreadMsgsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ChatsWithUnreadMsgsQuery = { __typename?: 'Query', chatsWithUnreadMsgs: Array<{ __typename?: 'Chat', id: number, name: string, createAt: any, revealGender: boolean, messages?: Array<{ __typename?: 'Message', id: number }> | null, firstPerson?: { __typename?: 'User', tId: string, tName: string } | null, secondPerson: { __typename?: 'User', tId: string, tName: string, tUsername: string, tPfp?: string | null } }> };
+
 export type ChatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ChatsQuery = { __typename?: 'Query', chats: Array<{ __typename?: 'Chat', id: number, createAt: any, firstPerson?: { __typename?: 'User', tUsername: string, tName: string, tId: string, tPfp?: string | null } | null, secondPerson: { __typename?: 'User', tId: string, tUsername: string, tName: string, tPfp?: string | null } }> };
-
-export type MarkSeenMutationVariables = Exact<{
-  messageId: Scalars['Float'];
-}>;
-
-
-export type MarkSeenMutation = { __typename?: 'Mutation', markSeen: boolean };
 
 export type CreateMessageMutationVariables = Exact<{
   body: Scalars['String'];
@@ -135,6 +160,13 @@ export type CreateMessageMutationVariables = Exact<{
 
 
 export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', id: number, createdAt: any, isSeen: boolean, body: string, sender: Sender } };
+
+export type MarkSeenMutationVariables = Exact<{
+  messageId: Scalars['Float'];
+}>;
+
+
+export type MarkSeenMutation = { __typename?: 'Mutation', markSeen: boolean };
 
 export type MessagesQueryVariables = Exact<{
   chatId: Scalars['Float'];
@@ -156,11 +188,6 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', createAt?: any | null, tId: string, tPfp?: string | null, tUsername: string, tName: string } };
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
-
 export type UserQueryVariables = Exact<{
   tUsername: Scalars['String'];
 }>;
@@ -169,11 +196,13 @@ export type UserQueryVariables = Exact<{
 export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', createAt?: any | null, tId: string, tPfp?: string | null, tUsername: string, tName: string, isRegistered?: boolean | null, publicMetrics?: { __typename?: 'PublicMetrics', followersCount: number, followingCount: number } | null } | null };
 
 
+export const ChatWithUnreadMsgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ChatWithUnreadMsgs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chatWithUnreadMsgs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"revealGender"}},{"kind":"Field","name":{"kind":"Name","value":"firstPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}},{"kind":"Field","name":{"kind":"Name","value":"secondPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<ChatWithUnreadMsgsQuery, ChatWithUnreadMsgsQueryVariables>;
+export const ChatDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Chat"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chat"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"firstPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}},{"kind":"Field","name":{"kind":"Name","value":"secondPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}}]}}]}}]} as unknown as DocumentNode<ChatQuery, ChatQueryVariables>;
+export const ChatsWithUnreadMsgsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ChatsWithUnreadMsgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chatsWithUnreadMsgs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"revealGender"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"firstPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"secondPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}}]}}]}}]} as unknown as DocumentNode<ChatsWithUnreadMsgsQuery, ChatsWithUnreadMsgsQueryVariables>;
 export const ChatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Chats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"chats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"firstPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}},{"kind":"Field","name":{"kind":"Name","value":"secondPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}}]}}]}}]}}]} as unknown as DocumentNode<ChatsQuery, ChatsQueryVariables>;
-export const MarkSeenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"MarkSeen"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markSeen"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"messageId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}}}]}]}}]} as unknown as DocumentNode<MarkSeenMutation, MarkSeenMutationVariables>;
 export const CreateMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMessage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"body"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMessage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"body"},"value":{"kind":"Variable","name":{"kind":"Name","value":"body"}}},{"kind":"Argument","name":{"kind":"Name","value":"chatId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"isSeen"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"sender"}}]}}]}}]} as unknown as DocumentNode<CreateMessageMutation, CreateMessageMutationVariables>;
+export const MarkSeenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"MarkSeen"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markSeen"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"messageId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"messageId"}}}]}]}}]} as unknown as DocumentNode<MarkSeenMutation, MarkSeenMutationVariables>;
 export const MessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Messages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursorType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CursorType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"chatId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chatId"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"cursorType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursorType"}}},{"kind":"Argument","name":{"kind":"Name","value":"cursor"},"value":{"kind":"Variable","name":{"kind":"Name","value":"cursor"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"isSeen"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"chatId"}},{"kind":"Field","name":{"kind":"Name","value":"sender"}}]}}]}}]} as unknown as DocumentNode<MessagesQuery, MessagesQueryVariables>;
 export const NewMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"NewMessage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newMessage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"isSeen"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"sender"}},{"kind":"Field","name":{"kind":"Name","value":"chatId"}}]}}]}}]} as unknown as DocumentNode<NewMessageSubscription, NewMessageSubscriptionVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}},{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
-export const LogoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"logout"}}]}}]} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
 export const UserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"User"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tUsername"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"tUsername"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tUsername"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAt"}},{"kind":"Field","name":{"kind":"Name","value":"tId"}},{"kind":"Field","name":{"kind":"Name","value":"tPfp"}},{"kind":"Field","name":{"kind":"Name","value":"tUsername"}},{"kind":"Field","name":{"kind":"Name","value":"tName"}},{"kind":"Field","name":{"kind":"Name","value":"publicMetrics"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"followersCount"}},{"kind":"Field","name":{"kind":"Name","value":"followingCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"isRegistered"}}]}}]}}]} as unknown as DocumentNode<UserQuery, UserQueryVariables>;

@@ -1,35 +1,19 @@
 import { Box, Loader } from '@mantine/core';
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { ChatBubble, LoadingChatBubble } from 'chat-bubble';
-import { Header } from 'chat-main/header';
-import { gqlClient } from 'gql-client';
-import {
-  Chat,
-  CreateMessageDocument,
-  CreateMessageMutation,
-  CreateMessageMutationVariables,
-  CursorType,
-  Message,
-  MessagesDocument,
-  MessagesQuery,
-  Sender,
-} from 'graphql/generated';
-import { getNewMessagesData } from 'query-utils';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCreateMsgMutaton, useMessagesQuery } from 'chat/api';
+import { Chat, Sender } from 'graphql/generated';
+import React, { useEffect, useRef, useState } from 'react';
 
+import { LoadingChatBubble, MessageBubble } from '../message-bubble';
 import { ChatInput } from './chat-input';
 import { ChatScrollApi, ChatScrollArea } from './chat-scroll-area';
+import { Header } from './header';
 
-export interface ChatMainProps {
+export interface ChatFeedProps {
   chat: Chat | null;
+  chatIndex: number;
   onEmptyChat: () => void;
 }
-export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }) => {
+export const ChatFeed: React.FC<ChatFeedProps> = ({ chat, onEmptyChat, ...rest }) => {
   const scrollApiRef = useRef<ChatScrollApi>();
   const prevStateRef = useRef<{
     isLoading: boolean;
@@ -40,38 +24,14 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
     loadingMsgsLength: number;
   }>();
 
-  const fetchMessages = useCallback(
-    async ({
-      pageParam = {},
-    }: {
-      pageParam?: { cursor?: number; cursorType?: CursorType };
-    }) => {
-      if (!chat) return;
-
-      const { messages } = await gqlClient.request<MessagesQuery>(MessagesDocument, {
-        chatId: chat.id,
-        cursor: pageParam?.cursor,
-        CursorType: pageParam?.cursorType,
-      });
-
-      return messages.reverse();
-    },
-    [chat],
-  );
   const [loadingMsgs, setLoadingMsgs] = useState<string[]>([]);
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const sender = chat?.firstPerson ? Sender.FirstPerson : Sender.SecondPerson;
 
   const { data, isLoading, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } =
-    useInfiniteQuery(['messages', chat?.id], fetchMessages, {
-      getNextPageParam: (lastPage) => ({ cursor: lastPage?.at(-1)?.id }),
-      getPreviousPageParam: (firstPage = []) => {
-        if (firstPage.length < 12) return undefined;
-        return { cursor: firstPage?.at(0)?.id };
-      },
-    });
+    useMessagesQuery(chat?.id || null);
 
   // this will put the scroll to bottom at start
   useEffect(() => {
@@ -80,41 +40,20 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
     }
   }, [chat, isLoading]);
 
-  const createMessgeRequest = async ({
-    chatId,
-    body,
-  }: CreateMessageMutationVariables) => {
-    const { createMessage } = await gqlClient.request<CreateMessageMutation>(
-      CreateMessageDocument,
-      {
-        chatId,
-        body,
-      },
-    );
-
-    return createMessage;
-  };
-
-  const createMsgMutation = useMutation(createMessgeRequest, {
-    onSuccess: (message) => {
-      queryClient.setQueryData<InfiniteData<Message[]>>(
-        ['messages', chat?.id],
-        (data) => {
-          const newData = getNewMessagesData(data, message);
-
-          setLoadingMsgs(loadingMsgs.filter((text) => text !== message.body));
-
-          return newData;
-        },
-      );
-    },
-  });
+  const createMsgMutation = useCreateMsgMutaton(chat?.id || 1);
 
   const handleCreateMessage = (text: string) => {
     if (!chat) return;
     scrollApiRef.current?.scrollToBottom();
     setLoadingMsgs([...loadingMsgs, text]);
-    createMsgMutation.mutate({ body: text, chatId: chat.id });
+    createMsgMutation.mutate(
+      { body: text, chatId: chat.id },
+      {
+        onSuccess: () => {
+          setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
+        },
+      },
+    );
   };
 
   useEffect(() => {
@@ -122,14 +61,24 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
     const scrollApi = scrollApiRef.current;
 
     if (
+      // for new message by creation
       prevState &&
       scrollApi &&
-      (prevState.lastPageLength !== data?.pages[data?.pages.length - 1]?.length ||
-        data?.pages[data?.pages.length - 1]?.length == 1) &&
+      loadingMsgs.length !== prevState.loadingMsgsLength &&
       scrollApi.snapshot().wasScrollToBottom
     ) {
       scrollApi.scrollToBottom('smooth');
     } else if (
+      // for new message from subscription data?.pages[data?.pages.length - 1]?.length)
+      (prevState &&
+        scrollApi &&
+        scrollApi?.snapshot().wasScrollToBottom &&
+        prevState.lastPageLength !== data?.pages[data?.pages.length - 1]?.length) ||
+      data?.pages[data?.pages.length - 1]?.length === 1
+    ) {
+      scrollApi?.scrollToBottom('smooth');
+    } else if (
+      // for old messages
       prevState &&
       scrollApi &&
       prevState.isFetchingPreviousPage &&
@@ -137,7 +86,7 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
     ) {
       scrollApi.scrollToMatch();
     }
-  }, [data, hasPreviousPage, loadingMsgs]);
+  }, [data, hasPreviousPage, loadingMsgs, prevStateRef, scrollApiRef]);
 
   useEffect(() => {
     prevStateRef.current = {
@@ -188,7 +137,9 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
           data?.pages.map((msgs, indexA) => (
             <React.Fragment key={'msgBody-' + indexA}>
               {msgs?.map((msg, indexB) => (
-                <ChatBubble
+                <MessageBubble
+                  chatId={chat.id}
+                  chatIndex={chat.id}
                   key={msg.id}
                   sender={sender}
                   indices={[indexA, indexB]}
@@ -206,4 +157,4 @@ export const ChatMain: React.FC<ChatMainProps> = ({ chat, onEmptyChat, ...rest }
   );
 };
 
-ChatMain.displayName = 'ChatMain';
+ChatFeed.displayName = 'ChatFeed';

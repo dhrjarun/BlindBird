@@ -1,12 +1,20 @@
 import { ActionIcon, Avatar, Box, Group, MediaQuery, Text } from '@mantine/core';
+import { Chat } from 'graphql/generated';
 import React from 'react';
 import { ArrowLeft } from 'react-feather';
 
+import { getDisplayNameAndPfp } from '../../utils';
+
 export interface HeaderProps {
   onBack?: () => void;
+  chat?: Chat | null;
 }
 export const Header = React.forwardRef<HTMLHeadElement, HeaderProps>(
-  ({ onBack }, ref) => {
+  ({ chat, onBack }, ref) => {
+    if (!chat) return null;
+
+    const { name, pfp } = getDisplayNameAndPfp(chat);
+
     return (
       <Box
         component="header"
@@ -25,8 +33,8 @@ export const Header = React.forwardRef<HTMLHeadElement, HeaderProps>(
               <ArrowLeft />
             </ActionIcon>
           </MediaQuery>
-          <Avatar radius="xl" color="blue" />
-          <Text>Dhiraj Arun</Text>
+          <Avatar radius="xl" color="blue" src={pfp} />
+          <Text>{name}</Text>
         </Group>
       </Box>
     );
