@@ -2,6 +2,7 @@ import { Alert, Avatar, Box, Button, Group, Skeleton, Text, Title } from '@manti
 import { useQuery } from '@tanstack/react-query';
 import { gqlClient } from 'gql-client';
 import { UserDocument, UserQuery } from 'graphql/generated';
+import { Logo } from 'logo';
 import React from 'react';
 import { Info } from 'react-feather';
 import { useParams } from 'react-router-dom';
@@ -64,6 +65,7 @@ export function UserProfile() {
         padding: theme.spacing.md,
       })}
     >
+      <Logo sx={{ position: 'fixed', top: '20px', left: '20px' }} />
       {isLoading ? (
         <Box
           sx={() => ({
