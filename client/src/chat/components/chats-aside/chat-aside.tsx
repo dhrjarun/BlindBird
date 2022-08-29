@@ -22,10 +22,9 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
       <ScrollArea viewportRef={ref} {...getScrollAreaProps(rest)}>
         {chats?.map((chat, index) => (
           <Item
+            chat={chat as Chat}
             isActive={chat.id === activeChat?.id}
             key={chat.id}
-            name={chat?.firstPerson ? chat.secondPerson.tName : `unknown #${chat.id}`}
-            pfp={chat?.firstPerson ? chat.secondPerson.tPfp : null}
             onClick={() => {
               onActiveChatChange({ chat: chat as Chat, chatIndex: index });
             }}
