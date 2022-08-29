@@ -11,19 +11,21 @@ export const BubbleBase = React.forwardRef<HTMLDivElement, BubbleBaseProps>(
   ({ children, sx, align }, ref) => {
     return (
       <Text
-        sx={(theme) => ({
-          padding: theme.spacing.xs,
-          paddingBottom: '0',
-          borderRadius: theme.radius.sm,
-          boxShadow: theme.shadows.xs,
-          justifySelf: align === 'right' ? 'flex-end' : 'flex-start',
-          wordWrap: 'break-word',
-          maxWidth: '70%',
-          [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-            maxWidth: '85%',
-          },
-          ...getSx(sx, theme),
-        })}
+        sx={[
+          (theme) => ({
+            padding: theme.spacing.xs,
+            paddingBottom: '0',
+            borderRadius: theme.radius.sm,
+            boxShadow: theme.shadows.xs,
+            justifySelf: align === 'right' ? 'flex-end' : 'flex-start',
+            wordWrap: 'break-word',
+            maxWidth: '70%',
+            [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+              maxWidth: '85%',
+            },
+          }),
+          ...getSx(sx),
+        ]}
         ref={ref}
       >
         {children}
