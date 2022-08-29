@@ -1,19 +1,12 @@
-import { Box, Button, Container, Text } from '@mantine/core';
-import { TWT_REGISTER } from 'constants/api';
+import { Box, Container } from '@mantine/core';
+import { Logo } from 'logo';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { RegisterButton } from 'register-button';
 import { UserAvatar } from 'user-avatar';
-import { userUserCtx } from 'user-ctx';
 
 export interface PrimaryHeaderProps {}
 export const PrimaryHeader = React.forwardRef<HTMLHeadElement, PrimaryHeaderProps>(
   (props, ref) => {
-    const handleRegister = () => {
-      window.open(TWT_REGISTER, '_self');
-    };
-
-    const user = userUserCtx();
-
     return (
       <Box
         component="header"
@@ -29,20 +22,9 @@ export const PrimaryHeader = React.forwardRef<HTMLHeadElement, PrimaryHeaderProp
         <Container
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <Text
-            component={Link}
-            to="/"
-            sx={{ lineHeight: '1em', height: '1em', fontSize: '1.7rem' }}
-          >
-            🕊
-          </Text>
-          {!user ? (
-            <Button radius="xs" onClick={handleRegister} size="sm">
-              Register
-            </Button>
-          ) : (
-            <UserAvatar size="sm" />
-          )}
+          <Logo size="sm" />
+          <RegisterButton size="sm">Register</RegisterButton>
+          <UserAvatar size="sm" />
         </Container>
       </Box>
     );

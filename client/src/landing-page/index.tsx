@@ -13,9 +13,10 @@ import {
 import { DHRJ_GITHUB, DHRJ_TWITTER, GITHUB_REPO } from 'constants/links';
 import { BASE, CHAT_PLACE, TWT_PROFILES } from 'constants/routes';
 import { Field, Form, Formik } from 'formik';
+import { Logo } from 'logo';
 import React from 'react';
 import { AtSign, Twitter } from 'react-feather';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { RegisterButton } from 'register-button';
 import { UserAvatar } from 'user-avatar';
 import { userUserCtx } from 'user-ctx';
@@ -41,13 +42,7 @@ export function LandingPage() {
           justifyContent: 'space-between',
         }}
       >
-        <Text
-          component={Link}
-          sx={() => ({ fontSize: '60px', hover: { textDecoration: 'none' } })}
-          to="/"
-        >
-          🕊
-        </Text>
+        <Logo size="lg" m="md" />
         <RegisterButton size="sm" radius="xs">
           Register
         </RegisterButton>
