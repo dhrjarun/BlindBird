@@ -1,9 +1,6 @@
-import { useMutation } from '@tanstack/react-query';
 import { useMarkReadMutation } from 'chat/api';
-import { gqlClient } from 'gql-client';
-import { MarkSeenMutationVariables, Message, Sender } from 'graphql/generated';
-import { MarkSeenDocument, MarkSeenMutation } from 'graphql/generated';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { Message, Sender } from 'graphql/generated';
+import React, { useEffect, useRef } from 'react';
 
 import { BubbleBase, BubbleBaseContainer } from './bubble-base';
 import { Time } from './time';
@@ -21,22 +18,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const isMyBubble = message.sender === sender;
 
-    // const markSeenRequest = useCallback(async () => {
-    //   const { markSeen } = await gqlClient.request<
-    //     MarkSeenMutation,
-    //     MarkSeenMutationVariables
-    //   >(MarkSeenDocument, {
-    //     messageId: message.id,
-    //   });
-    //   return markSeen;
-    // }, [message]);
-
-    // const markSeenMutation = useMutation<boolean, unknown>(markSeenRequest, {
-    //   onSuccess: () => {
-    //     if (!message.chatId) return;
-    //   },
-    // });
-
     const markSeenMutation = useMarkReadMutation(chatId, chatIndex, message.id, indices);
 
     useEffect(() => {
@@ -46,8 +27,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
         const handleObserver = (entries: IntersectionObserverEntry[]) => {
           const target = entries[0];
           if (target.isIntersecting) {
-            console.log('message intersecting');
-
             markSeenMutation.mutate({ messageId: message.id });
           }
         };
