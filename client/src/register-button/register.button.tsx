@@ -3,7 +3,7 @@ import { TWT_REGISTER } from 'constants/api';
 import { BASE } from 'constants/routes';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { useUserCtx } from 'user-ctx';
+import { useUserCtx } from 'user';
 
 export interface RegisterButtonProps extends ButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -12,7 +12,7 @@ export interface RegisterButtonProps extends ButtonProps {
 export const RegisterButton = React.forwardRef<HTMLButtonElement, RegisterButtonProps>(
   (props, ref) => {
     const location = useLocation();
-    const user = useUserCtx();
+    const { user } = useUserCtx();
 
     if (user) return null;
 

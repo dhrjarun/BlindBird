@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ChatProvider } from 'chat';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { UserProvider } from 'user';
 
 import App from './App';
 
@@ -19,10 +20,12 @@ const queryClient = new QueryClient({
 ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ChatProvider>
-        <App />
-        <ReactQueryDevtools />
-      </ChatProvider>
+      <UserProvider>
+        <ChatProvider>
+          <App />
+          <ReactQueryDevtools />
+        </ChatProvider>
+      </UserProvider>
     </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root'),
