@@ -1,30 +1,14 @@
 import { Box, Container } from '@mantine/core';
-import { Chat as ChatType } from 'graphql/generated';
-import React, { useState } from 'react';
+import { useChatCtx } from 'chat/api';
+import React from 'react';
 
 import { ChatFeed } from '../chat-feed';
 import { ChatAside } from '../chats-aside';
 import { PrimaryHeader } from './primary-header';
 import { SidebarHeader } from './sidebar-header';
 
-export type ChatData = {
-  chat: ChatType;
-  chatIndex: number;
-};
-
 export function Chat() {
-  const [activeChatData, setActiveChatData] = useState<{
-    chat: ChatType;
-    chatIndex: number;
-  } | null>(null);
-
-  const handleActiveChatChange = (chatData: ChatData) => {
-    setActiveChatData(chatData);
-  };
-
-  const handleEmptyChat = () => {
-    setActiveChatData(null);
-  };
+  const { activeChat } = useChatCtx();
 
   return (
     <Box>
@@ -45,22 +29,15 @@ export function Chat() {
               display: 'grid',
               gridTemplateRows: 'max-content 1fr',
               gridTemplateColumns: '1fr',
-              [`@media (max-width: ${theme.breakpoints.md}px)`]: activeChatData
+              [`@media (max-width: ${theme.breakpoints.md}px)`]: activeChat
                 ? { display: 'none' }
                 : { flexBasis: '100%' },
             })}
           >
             <SidebarHeader />
-            <ChatAside
-              onActiveChatChange={handleActiveChatChange}
-              activeChat={activeChatData?.chat || null}
-            />
+            <ChatAside />
           </Box>
-          <ChatFeed
-            chatIndex={activeChatData?.chatIndex ?? -1}
-            chat={activeChatData?.chat || null}
-            onEmptyChat={handleEmptyChat}
-          />
+          <ChatFeed />
         </Box>
       </Container>
     </Box>

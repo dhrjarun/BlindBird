@@ -2,17 +2,14 @@ import { ScrollArea, ScrollAreaProps } from '@mantine/core';
 import { Chat } from 'graphql/generated';
 import React from 'react';
 
-import { useChatsWithUnreadMsgsQuery } from '../../api';
-import { ChatData } from '../chat';
+import { useChatCtx, useChatsWithUnreadMsgsQuery } from '../../api';
 import { Item } from './item';
 
-export interface ChatAsideProps {
-  activeChat: Chat | null;
-  onActiveChatChange: (chat: ChatData) => void;
-}
+export interface ChatAsideProps {}
 export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
-  ({ activeChat, onActiveChatChange, ...rest }, ref) => {
+  ({ ...rest }, ref) => {
     const { data: chats, isLoading, isError } = useChatsWithUnreadMsgsQuery();
+    const { activeChat, setChatData } = useChatCtx();
 
     if (isLoading || !chats)
       return <ScrollArea {...getScrollAreaProps(rest)}>loading</ScrollArea>;
@@ -26,7 +23,7 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
             isActive={chat.id === activeChat?.id}
             key={chat.id}
             onClick={() => {
-              onActiveChatChange({ chat: chat as Chat, chatIndex: index });
+              setChatData({ activeChat: chat as Chat, activeChatIndex: index });
             }}
           />
         ))}

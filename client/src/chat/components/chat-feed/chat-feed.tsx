@@ -1,6 +1,6 @@
 import { Box, Loader } from '@mantine/core';
-import { useCreateMsgMutaton, useMessagesQuery } from 'chat/api';
-import { Chat, Sender } from 'graphql/generated';
+import { useChatCtx, useCreateMsgMutaton, useMessagesQuery } from 'chat/api';
+import { Sender } from 'graphql/generated';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { LoadingChatBubble, MessageBubble } from '../message-bubble';
@@ -8,17 +8,8 @@ import { ChatInput } from './chat-input';
 import { ChatScrollApi, ChatScrollArea } from './chat-scroll-area';
 import { Header } from './header';
 
-export interface ChatFeedProps {
-  chat: Chat | null;
-  chatIndex: number;
-  onEmptyChat: () => void;
-}
-export const ChatFeed: React.FC<ChatFeedProps> = ({
-  chat,
-  chatIndex,
-  onEmptyChat,
-  ...rest
-}) => {
+export interface ChatFeedProps {}
+export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
   const scrollApiRef = useRef<ChatScrollApi>();
   const prevStateRef = useRef<{
     isLoading: boolean;
@@ -29,9 +20,9 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
     loadingMsgsLength: number;
   }>();
 
-  const [loadingMsgs, setLoadingMsgs] = useState<string[]>([]);
+  const { activeChat: chat, activeChatIndex: chatIndex } = useChatCtx();
 
-  // const queryClient = useQueryClient();
+  const [loadingMsgs, setLoadingMsgs] = useState<string[]>([]);
 
   const sender = chat?.firstPerson ? Sender.FirstPerson : Sender.SecondPerson;
 
@@ -120,7 +111,7 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
       })}
       {...rest}
     >
-      <Header onBack={onEmptyChat} chat={chat} />
+      <Header />
       <ChatScrollArea
         getChatScrollApi={(api) => {
           scrollApiRef.current = api;
