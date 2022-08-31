@@ -1,21 +1,28 @@
-import { Arg, Authorized, Ctx, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 import dataSource from '../../data-source'
 import User from '../../entity/User'
+import { logout } from './logout'
 
 @Resolver()
 export class UserResolver {
   @Authorized()
-  @Query(() => User)
+  @Query(() => User, { nullable: true })
   async me(@Ctx() context: MyCtx) {
     const user = await dataSource
       .createQueryBuilder(User, 'user')
       .select('user')
-      .where('user.id = :id', { id: context.req.user!.id })
+      .where('user.id = :id', { id: context.req?.user?.id })
       .getOne()
 
     await user?.populateTwtPfpByTId()
 
     return user
+  }
+
+  @Authorized()
+  @Mutation(() => Boolean)
+  async logout(@Ctx() context: MyCtx) {
+    return logout(context.req, context.res)
   }
 
   @Query(() => User, { nullable: true })

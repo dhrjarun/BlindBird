@@ -15,6 +15,7 @@ import Message, { Sender } from '../../entity/Message'
 import Chat from '../../entity/Chat'
 import dataSource from '../../data-source'
 import User from '../../entity/User'
+import { AuthenticationError } from 'apollo-server-core'
 
 export enum CursorType {
   BEFORE = 'before',
@@ -27,7 +28,8 @@ registerEnumType(CursorType, {
 
 @Resolver()
 export class MessageResolver {
-  @Query((returns) => [Message])
+  @Authorized()
+  @Query((returns) => [Message], { nullable: true })
   async messages(
     @Arg('chatId') chatId: number,
     @Arg('cursor', { nullable: true }) cursor: number,
@@ -57,7 +59,7 @@ export class MessageResolver {
   }
 
   @Authorized()
-  @Mutation((returns) => Message)
+  @Mutation((returns) => Message, { nullable: true })
   async createMessage(
     @Ctx() context: MyCtx,
     @Arg('chatId') chatId: number,
@@ -104,8 +106,8 @@ export class MessageResolver {
 
   @Subscription({
     topics: ({ context }) => {
-      console.log('context', context.user)
-      return 'NEW_MESSAGE:' + context.user?.id
+      if (!context.user) throw new AuthenticationError('User need to signed in')
+      return 'NEW_MESSAGE:' + context.user.id
     },
   })
   newMessage(@Root() message: Message): Message {

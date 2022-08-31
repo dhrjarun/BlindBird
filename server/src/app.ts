@@ -5,6 +5,7 @@ import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageProductionDefault,
   ApolloServerPluginLandingPageLocalDefault,
+  AuthenticationError,
 } from 'apollo-server-core'
 import { buildSchema } from 'type-graphql'
 import express from 'express'
@@ -152,9 +153,9 @@ async function main() {
     return new Promise((resolve, reject) => {
       sessionParser(req, res, () => {
         const session = req.session as any
-        const user: User | null = session.passport.user
+        const user: User | null = session.passport?.user
 
-        if (!user) return reject('Unauthorized')
+        if (!user) return resolve({ user: null })
         resolve({ user })
       })
     })

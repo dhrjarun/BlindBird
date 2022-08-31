@@ -37,7 +37,7 @@ export class ChatResolver {
     return chat
   }
 
-  @Query((returns) => [Chat])
+  @Query((returns) => [Chat], { nullable: true })
   @Authorized()
   async chats(@Ctx() context: MyCtx) {
     return await dataSource
@@ -72,7 +72,7 @@ export class ChatResolver {
   }
 
   @Authorized()
-  @Query((returns) => [Chat])
+  @Query((returns) => [Chat], { nullable: true })
   async chatsWithUnreadMsgs(@Ctx() context: MyCtx): Promise<Chat[]> {
     return await dataSource
       .createQueryBuilder(Chat, 'chat')
