@@ -6,6 +6,7 @@ import {
   ApolloServerPluginLandingPageProductionDefault,
   ApolloServerPluginLandingPageLocalDefault,
   AuthenticationError,
+  ApolloError,
 } from 'apollo-server-core'
 import { buildSchema } from 'type-graphql'
 import express from 'express'
@@ -129,6 +130,14 @@ async function main() {
         },
       },
     ],
+    formatError: (err) => {
+      if (err.originalError instanceof ApolloError) return err
+
+      return new ApolloError(
+        'Something unexpected happened',
+        'INTERNAL_SERVER_ERROR',
+      )
+    },
     csrfPrevention: true,
   })
 
