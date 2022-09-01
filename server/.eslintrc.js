@@ -7,9 +7,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended' /* https://github.com/typescript-eslint/typescript-eslint#readme */,
     'prettier',
   ],
-  parserOptions: {
-    project: './tsconfig.json',
-  },
+  parserOptions: {},
   ignorePatterns: ['.eslintrc.js', 'dist/', 'node_modules/', 'jest.config.js'],
   rules: {
     'no-console': 'warn',
