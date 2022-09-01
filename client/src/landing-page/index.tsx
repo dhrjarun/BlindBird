@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Anchor,
   Box,
   Button,
@@ -7,23 +8,27 @@ import {
   Group,
   Input,
   MantineTheme,
+  Modal,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core';
-import { DHRJ_GITHUB, DHRJ_TWITTER, GITHUB_REPO } from 'constants/links';
+import { DHRJ_GITHUB, DHRJ_TWITTER, GITHUB_REPO, TWT_BLIND_LINK } from 'constants/links';
+import { TWT_ABOUT_US_LINK } from 'constants/links';
 import { BASE, CHAT_PLACE, TWT_PROFILES } from 'constants/routes';
 import { Field, Form, Formik } from 'formik';
 import { Logo } from 'logo';
-import React from 'react';
-import { AtSign, Twitter } from 'react-feather';
+import React, { useState } from 'react';
+import { AtSign, GitHub } from 'react-feather';
 import { useNavigate } from 'react-router-dom';
 import { RegisterButton } from 'register-button';
+import { useUserCtx } from 'user';
 import { UserAvatar } from 'user-avatar';
-import { useUserCtx } from 'user-ctx';
 
 export function LandingPage() {
-  const user = useUserCtx();
+  const { user } = useUserCtx();
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Container
@@ -43,10 +48,24 @@ export function LandingPage() {
         }}
       >
         <Logo size="lg" m="md" />
-        <RegisterButton size="sm" radius="xs">
-          Register
-        </RegisterButton>
-        <UserAvatar />
+        <Group>
+          <Tooltip label="Github Repo">
+            <ActionIcon
+              component="a"
+              href={GITHUB_REPO}
+              target="_blank"
+              radius="xl"
+              size="lg"
+              variant="filled"
+            >
+              <GitHub size="16" />
+            </ActionIcon>
+          </Tooltip>
+          <RegisterButton size="sm" radius="xs">
+            Register
+          </RegisterButton>
+          <UserAvatar />
+        </Group>
       </Box>
       <Box component="main" sx={{ alignSelf: 'center', paddingBottom: '4rem' }}>
         <Title
@@ -93,8 +112,8 @@ export function LandingPage() {
                     disabled={isSubmitting}
                     size="xs"
                     type="submit"
-                    variant="light"
-                    onClick={() => {}}
+                    variant="filled"
+                    color="gray"
                   >
                     Submit
                   </Button>
@@ -115,29 +134,94 @@ export function LandingPage() {
             Go to Chat
           </Button>
 
-          <CopyButton timeout={20000} value={`${BASE}${TWT_PROFILES}/${user?.tUsername}`}>
-            {({ copied, copy }) => (
-              <Button
-                compact
-                size="sm"
-                onClick={copy}
-                color={copied ? 'green' : ''}
-                variant={copied ? 'light' : 'subtle'}
-              >
-                Copy Blind Link
-              </Button>
-            )}
-          </CopyButton>
+          {user && (
+            <CopyButton
+              timeout={20000}
+              value={`${BASE}${TWT_PROFILES}/${user?.tUsername}`}
+            >
+              {({ copied, copy }) => (
+                <Button
+                  compact
+                  size="sm"
+                  onClick={copy}
+                  color={copied ? 'green' : ''}
+                  variant={copied ? 'light' : 'subtle'}
+                >
+                  Copy Blind Link
+                </Button>
+              )}
+            </CopyButton>
+          )}
+
           <Button
             component="a"
-            href={GITHUB_REPO}
+            href={
+              user
+                ? TWT_BLIND_LINK + `${BASE}${TWT_PROFILES}/${user?.tUsername}`
+                : TWT_ABOUT_US_LINK
+            }
             target="_blank"
             compact
             size="sm"
             variant="subtle"
           >
-            Github Repo
+            Tweet
           </Button>
+
+          <Modal
+            centered={true}
+            opened={modalOpen}
+            onClose={() => setModalOpen(false)}
+            title="Quick Start Guide"
+          >
+            <Text size="sm" weight="bold">
+              What is BlindBird? 🕊
+            </Text>
+            <Text color="gray" size="sm" mb="md">
+              BlindBird is a Anonymous chatting App. In simple words, here you can chat
+              with a person without revealing your identity.
+            </Text>
+
+            <Text size="sm" weight="bold">
+              How to Start? 🎬
+            </Text>
+            <Text color="gray" size="sm" mb="md">
+              For that you need to register using twitter. You will get your BlindLink
+              after that.
+            </Text>
+
+            <Text size="sm" weight="bold">
+              What is Blind Link? 🔗
+            </Text>
+            <Text color="gray" size="sm" mb="md">
+              Blind Link is the URL, by which you can message a person or someone can
+              message you.
+            </Text>
+
+            <Text size="sm" weight="bold">
+              Do I store your email? 📫
+            </Text>
+            <Text color="gray" size="sm" mb="md">
+              Nope.
+            </Text>
+          </Modal>
+
+          <Button
+            onClick={() => {
+              setModalOpen(true);
+            }}
+            compact
+            size="sm"
+            variant="subtle"
+          >
+            Quick-Start Guide
+          </Button>
+
+          {!user && (
+            <RegisterButton compact size="sm" variant="subtle">
+              Let&apos;s go
+            </RegisterButton>
+          )}
         </Group>
       </Box>
       <Box component="footer" sx={{ alignSelf: 'flex-end', padding: '2rem' }}>
