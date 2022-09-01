@@ -6,4 +6,8 @@ export const redis = new Redis({
   username: process.env.REDIS_USERNAME,
   password: process.env.REDIS_PWD,
   db: 0,
+  retryStrategy: (times) => {
+    // reconnect after
+    return Math.min(times * 50, 2000)
+  },
 })

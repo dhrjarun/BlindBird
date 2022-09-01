@@ -19,8 +19,8 @@ import http from 'http'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { WebSocketServer } from 'ws'
 import { Extra, useServer } from 'graphql-ws/lib/use/ws'
-import { Kafka } from 'kafkajs'
-import { KafkaPubSub } from 'graphql-kafkajs-subscriptions'
+import connectRedis from 'connect-redis'
+import { pubsub } from './pubsub'
 
 import authBoot from './boot/auth'
 import dbBoot from './boot/db'
@@ -49,24 +49,12 @@ export const authChecker: AuthChecker<MyCtx> = async (
   return true
 }
 
-const kafka = new Kafka({
-  clientId: 'my-app',
-  brokers: ['localhost:9092'],
-})
-
-const pubsub = KafkaPubSub.create({
-  topic: 'message',
-  kafka: kafka,
-  groupIdPrefix: 'msg', // used for kafka pub/sub,
-  producerConfig: {},
-  consumerConfig: {},
-})
-
 async function main() {
   authBoot()
   dbBoot()
-  const RedisStore = redisBoot()
+  redisBoot()
 
+  const RedisStore = connectRedis(session)
   const sessionParser = session({
     store: new RedisStore({ client: redis }),
     name: config.get<string>('session_name'),
