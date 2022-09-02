@@ -12,7 +12,7 @@ export class ChatResolver {
     @Ctx() context: MyCtx,
     @Arg('name') name: string,
     @Arg('secondPersonTId') secondPersonTId: string,
-    @Arg('revealGender') revealGender: boolean = false,
+    @Arg('revealGender', () => Boolean) revealGender = false,
   ): Promise<Chat> {
     const firstPerson = new User()
     firstPerson.id = context.req.user!.id
@@ -45,7 +45,7 @@ export class ChatResolver {
       .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
       .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
       .where('chat.firstPerson.id = :id OR chat.secondPerson.id = :id', {
-        id: context.req.user!.id,
+        id: context.req.user?.id,
       })
       .getMany()
   }
@@ -53,18 +53,37 @@ export class ChatResolver {
   @Query((returns) => Chat, { nullable: true })
   @Authorized()
   async chat(
-    @Arg('id') id: number,
+    @Arg('id', { nullable: true }) id: number,
+    @Arg('secondPersonId', { nullable: true }) secondPersonId: number,
     @Ctx() context: MyCtx,
   ): Promise<Chat | null> {
+    if (!id && !secondPersonId) return null
+
+    if (id) {
+      return await dataSource
+        .createQueryBuilder(Chat, 'chat')
+        .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
+        .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
+        .where(
+          'chat.id = :chatId AND (chat.firstPerson.id = :userId OR chat.secondPerson.id = :userId)',
+          {
+            userId: context.req.user?.id,
+            chatId: id,
+          },
+        )
+        .select(['chat', 'firstPerson', 'secondPerson'])
+        .getOne()
+    }
+
     return await dataSource
       .createQueryBuilder(Chat, 'chat')
       .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
       .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
       .where(
-        'chat.id = :chatId AND (chat.firstPerson.id = :userId OR chat.secondPerson.id = :userId)',
+        'chat.firstPerson.id = :userId AND chat.secondPerson.id = :secondPersonId',
         {
-          userId: context.req.user!.id,
-          chatId: id,
+          userId: context.req.user?.id,
+          secondPersonId,
         },
       )
       .select(['chat', 'firstPerson', 'secondPerson'])
