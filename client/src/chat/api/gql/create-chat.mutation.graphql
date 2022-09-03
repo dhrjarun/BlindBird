@@ -1,0 +1,24 @@
+mutation CreateChat($revealGender: Boolean!, $secondPersonTId: String!, $name: String!) {
+  createChat(
+    revealGender: $revealGender
+    secondPersonTId: $secondPersonTId
+    name: $name
+  ) {
+    id
+    name
+    createAt
+    revealGender
+    firstPerson {
+      tUsername
+      tName
+      tId
+      tPfp
+    }
+    secondPerson {
+      tUsername
+      tName
+      tId
+      tPfp
+    }
+  }
+}
