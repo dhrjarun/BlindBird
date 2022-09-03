@@ -1,4 +1,4 @@
-import { useMarkReadMutation } from 'chat/api';
+import { useChatApi, useMarkReadMutation } from 'chat/api';
 import { Message, Sender } from 'graphql/generated';
 import React, { useEffect, useRef } from 'react';
 
@@ -18,7 +18,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const isMyBubble = message.sender === sender;
 
-    const markSeenMutation = useMarkReadMutation(chatId, chatIndex, message.id, indices);
+    const markSeenMutation = useMarkReadMutation();
+    const { makeMessageToRead, removeMsgFromChat } = useChatApi();
 
     useEffect(() => {
       let observer!: IntersectionObserver;
@@ -27,6 +28,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(
         const handleObserver = (entries: IntersectionObserverEntry[]) => {
           const target = entries[0];
           if (target.isIntersecting) {
+            makeMessageToRead(chatId, indices);
+            removeMsgFromChat(chatIndex, message.id);
             markSeenMutation.mutate({ messageId: message.id });
           }
         };

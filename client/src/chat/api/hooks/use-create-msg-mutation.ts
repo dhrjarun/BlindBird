@@ -8,7 +8,7 @@ import {
 
 import { useChatApi } from './use-chat-api';
 
-export const useCreateMsgMutaton = (chatId: number) => {
+export const useCreateMsgMutaton = (chatId: number | null) => {
   const chatApi = useChatApi();
 
   const createMessgeRequest = async ({
@@ -28,7 +28,9 @@ export const useCreateMsgMutaton = (chatId: number) => {
 
   return useMutation(createMessgeRequest, {
     onSuccess: (message) => {
-      chatApi.addMsgInMessagesIfExist(chatId, message);
+      if (chatId) {
+        chatApi.addMsgInMessagesIfExist(chatId, message);
+      }
     },
   });
 };
