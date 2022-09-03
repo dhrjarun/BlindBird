@@ -1,5 +1,5 @@
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { ChatsWithUnreadMsgsQuery, Message } from 'graphql/generated';
+import { Chat, ChatsWithUnreadMsgsQuery, Message } from 'graphql/generated';
 import { ChatWithUnreadMsgsQuery } from 'graphql/generated';
 import { produce } from 'immer';
 
@@ -24,8 +24,22 @@ export const useChatApi = () => {
     return index === -1 ? null : index;
   };
 
+  const getChatWithIndex = (id: number) => {
+    const chats = getChatsWithUnreadMsg() || [];
+    let chatIndex = -1;
+
+    const chat = chats.find((chat, index) => {
+      if (chat.id === id) {
+        chatIndex = index;
+        return true;
+      }
+    });
+
+    return { chat, chatIndex } || null;
+  };
+
   const addMsgInChatIfExist = (chatId: number, message: Message): boolean => {
-    let chatIndex: number | null = getChatIndex(chatId);
+    const chatIndex: number | null = getChatIndex(chatId);
     if (chatIndex === null || chatIndex === undefined) return false;
 
     queryClient.setQueryData<ChatsWithUnreadMsgs>(chatKeys.chatsWithUnreadMsg, (data) => {
@@ -108,5 +122,8 @@ export const useChatApi = () => {
     addMessageInChat,
     removeMsgFromChat,
     makeMessageToRead,
+    addNewChat,
+    getChatWithIndex,
+    getChatIndex,
   };
 };

@@ -1,16 +1,28 @@
 import { subscriptionClient } from 'gql-client';
 import { NewMessageSubscription } from 'graphql/generated';
 import { gql } from 'graphql-request';
+import { ExecutionResult } from 'graphql-ws';
 import { useEffect } from 'react';
 import { useUserCtx } from 'user';
 
 import { useChatApi } from './use-chat-api';
 
-export const useNewMsgSubscription = () => {
+export type OnNext = (value: ExecutionResult<NewMessageSubscription, unknown>) => void;
+export type OnError = (error: unknown) => void;
+export type onComplete = () => void;
+export interface UseNewMsgSubscriptionOptions {
+  onNext?: OnNext;
+  onError?: OnError;
+  onComplete?: onComplete;
+}
+export const useNewMsgSubscription = ({
+  onNext,
+  onError,
+  onComplete,
+}: UseNewMsgSubscriptionOptions = {}) => {
   let error: unknown;
-  let isComplete: boolean = false;
+  let isComplete = false;
   const { user } = useUserCtx();
-  console.log('useEffect sub outside', user);
 
   const { addMsgInMessagesIfExist, addMessageInChat } = useChatApi();
 
@@ -33,6 +45,7 @@ export const useNewMsgSubscription = () => {
       },
       {
         next: async (value) => {
+          if (onNext) onNext(value);
           const newMessage = value.data?.newMessage;
           const chatId = newMessage?.chatId;
           if (!chatId || !newMessage) return;
@@ -42,9 +55,11 @@ export const useNewMsgSubscription = () => {
         },
         error: (err) => {
           error = err;
+          if (onError) onError(err);
         },
         complete: () => {
           isComplete = true;
+          if (onComplete) onComplete();
         },
       },
     );
