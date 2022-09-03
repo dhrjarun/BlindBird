@@ -1,5 +1,5 @@
 schema: http://localhost:3100/graphql
-documents: './src/**/*.graphql'
+documents: ['./src/**/*.graphql', 'src/**/*.ts', 'src/**/*.tsx']
 generates:
   ./src/graphql/generated.ts:
     plugins:
