@@ -1,11 +1,13 @@
-import { Alert, Avatar, Box, Button, Group, Skeleton, Text, Title } from '@mantine/core';
+import { Avatar, Box, Button, Group, Skeleton, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { fetchChat, useChatApi, useChatCtx } from 'chat';
+import { CHAT_PLACE } from 'constants/routes';
 import { gqlClient } from 'gql-client';
-import { UserDocument, UserQuery } from 'graphql/generated';
+import { Chat, UserDocument, UserQuery } from 'graphql/generated';
 import { Logo } from 'logo';
 import React from 'react';
 import { Info } from 'react-feather';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { RegisterButton } from 'register-button';
 import { useUserCtx } from 'user';
 
@@ -15,6 +17,9 @@ export function UserProfile() {
   const { user } = useUserCtx();
 
   const { username } = useParams<{ username: string }>();
+  const { setChatData } = useChatCtx();
+  const { getChatWithIndex } = useChatApi();
+  const navigate = useNavigate();
 
   const fetchUser = async () => {
     const { user } = await gqlClient.request<UserQuery>(UserDocument, {
@@ -24,6 +29,25 @@ export function UserProfile() {
   };
 
   const { data, isLoading, isError } = useQuery(['user', username], fetchUser, {});
+
+  const handleChatClick = async () => {
+    if (data) {
+      const _chat = await fetchChat(null, data.tId);
+
+      if (_chat) {
+        const { chat, chatIndex } = getChatWithIndex(_chat.id);
+
+        setChatData({
+          type: 'reg_chat',
+          activeChat: chat as Chat,
+          activeChatIndex: chatIndex,
+        });
+      } else {
+        setChatData({ type: 'new_chat', secondPerson: data });
+      }
+      navigate(CHAT_PLACE);
+    }
+  };
 
   if (isError)
     return (
@@ -165,30 +189,24 @@ export function UserProfile() {
                 user.tUsername.toLowerCase() === username?.toLowerCase() ||
                 !data?.isRegistered
               }
+              onClick={handleChatClick}
             >
               Chat
             </Button>
           </Group>
+
           {!user && (
-            <Alert
-              icon={<Info size={16} />}
-              color={'red'}
-              sx={() => ({ marginTop: '4rem', maxWidth: '36ch' })}
-              title="Need to Register"
-            >
-              You can&apos;t chat without registering, Just click the button on the top to
-              register.
-            </Alert>
+            <Group mt="lg" spacing="xs" sx={(theme) => ({ color: theme.colors.red })}>
+              <Info size={14} />
+              <Text size="sm">Need to register</Text>
+            </Group>
           )}
+
           {user && !data?.isRegistered && (
-            <Alert
-              icon={<Info size={16} />}
-              color="red"
-              sx={() => ({ marginTop: '4rem', maxWidth: '36ch' })}
-              title={`${data?.tUsername} is not registered`}
-            >
-              The User is not registered with us, you can tweet about us by tagging him.
-            </Alert>
+            <Group mt="lg" spacing="xs" sx={(theme) => ({ color: theme.colors.red })}>
+              <Info size={14} />
+              <Text size="sm">{`${data?.tUsername} is not registered`}</Text>
+            </Group>
           )}
         </Box>
       )}
