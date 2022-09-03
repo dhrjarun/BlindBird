@@ -3,13 +3,18 @@ import { Chat } from 'graphql/generated';
 import React from 'react';
 
 import { useChatCtx, useChatsWithUnreadMsgsQuery } from '../../api';
+import { getDisplayNameAndPfp } from '../../utils';
 import { Item } from './item';
 
 export interface ChatAsideProps {}
 export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
   ({ ...rest }, ref) => {
     const { data: chats, isLoading, isError } = useChatsWithUnreadMsgsQuery();
-    const { activeChat, setChatData } = useChatCtx();
+
+    const {
+      data: { activeChat, secondPerson },
+      setChatData,
+    } = useChatCtx();
 
     if (isLoading || !chats)
       return <ScrollArea {...getScrollAreaProps(rest)}>loading</ScrollArea>;
@@ -17,13 +22,24 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
 
     return (
       <ScrollArea viewportRef={ref} {...getScrollAreaProps(rest)}>
+        {secondPerson && (
+          <Item
+            data={{ name: secondPerson.tName, pfp: secondPerson.tPfp }}
+            isActive={true}
+          />
+        )}
         {chats?.map((chat, index) => (
           <Item
             chat={chat as Chat}
+            data={getDisplayNameAndPfp(chat as Chat)}
             isActive={chat.id === activeChat?.id}
             key={chat.id}
             onClick={() => {
-              setChatData({ activeChat: chat as Chat, activeChatIndex: index });
+              setChatData({
+                type: 'reg_chat',
+                activeChat: chat as Chat,
+                activeChatIndex: index,
+              });
             }}
           />
         ))}

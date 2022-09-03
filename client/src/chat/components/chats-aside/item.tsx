@@ -2,16 +2,13 @@ import { Avatar, Badge, Group, Text } from '@mantine/core';
 import { Chat } from 'graphql/generated';
 import React from 'react';
 
-import { getDisplayNameAndPfp } from '../../utils';
-
 export interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-  chat: Chat;
+  chat?: Chat;
+  data: { name: string; pfp: string | null };
   isActive?: boolean;
 }
 export const Item = React.forwardRef<HTMLDivElement, ItemProps>(
-  ({ chat, isActive, ...rest }, ref) => {
-    const { name, pfp } = getDisplayNameAndPfp(chat);
-
+  ({ chat, data, isActive, ...rest }, ref) => {
     return (
       <Group
         position="apart"
@@ -27,10 +24,10 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>(
         ref={ref}
       >
         <Group>
-          <Avatar radius="xl" color="cyan" src={pfp} />
-          <Text>{name}</Text>
+          <Avatar radius="xl" color="cyan" src={data.pfp} />
+          <Text>{data.name}</Text>
         </Group>
-        {chat.messages && !isActive && chat.messages.length > 0 && (
+        {chat?.messages && !isActive && chat.messages.length > 0 && (
           <Badge radius="md">{chat.messages?.length}</Badge>
         )}
       </Group>

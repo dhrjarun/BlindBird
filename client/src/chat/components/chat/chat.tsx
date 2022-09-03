@@ -8,7 +8,7 @@ import { PrimaryHeader } from './primary-header';
 import { SidebarHeader } from './sidebar-header';
 
 export function Chat() {
-  const { activeChat } = useChatCtx();
+  const { chatData } = useChatCtx();
 
   return (
     <Box>
@@ -29,7 +29,7 @@ export function Chat() {
               display: 'grid',
               gridTemplateRows: 'max-content 1fr',
               gridTemplateColumns: '1fr',
-              [`@media (max-width: ${theme.breakpoints.md}px)`]: activeChat
+              [`@media (max-width: ${theme.breakpoints.md}px)`]: chatData
                 ? { display: 'none' }
                 : { flexBasis: '100%' },
             })}

@@ -1,12 +1,15 @@
 import { Chat } from 'graphql/generated';
 
-export function getDisplayNameAndPfp(chat: Chat) {
+export function getDisplayNameAndPfp(data: Chat): {
+  name: string;
+  pfp: string | null;
+} {
   return {
-    name: chat?.firstPerson
-      ? chat.secondPerson.tName
-      : chat.name
-      ? chat.name
-      : `unknown #${chat.id}`,
-    pfp: chat?.firstPerson ? chat.secondPerson.tPfp : null,
+    name: data?.firstPerson
+      ? data.secondPerson.tName
+      : data.name
+      ? data.name
+      : `unknown #${data.id}`,
+    pfp: data?.firstPerson ? data.secondPerson.tPfp || null : null,
   };
 }

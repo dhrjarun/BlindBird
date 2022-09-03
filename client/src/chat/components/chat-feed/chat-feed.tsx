@@ -1,5 +1,6 @@
 import { Box, Loader } from '@mantine/core';
-import { useChatCtx, useCreateMsgMutaton, useMessagesQuery } from 'chat/api';
+import { useChatApi, useChatCtx, useCreateMsgMutaton, useMessagesQuery } from 'chat/api';
+import { useCreateChatMutaton } from 'chat/api/hooks/user-create-chat-mutation';
 import { Sender } from 'graphql/generated';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -20,36 +21,73 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
     loadingMsgsLength: number;
   }>();
 
-  const { activeChat: chat, activeChatIndex: chatIndex } = useChatCtx();
+  const {
+    data: { activeChat, activeChatIndex, secondPerson },
+    chatData,
+    setChatData,
+  } = useChatCtx();
 
   const [loadingMsgs, setLoadingMsgs] = useState<string[]>([]);
 
-  const sender = chat?.firstPerson ? Sender.FirstPerson : Sender.SecondPerson;
+  const sender = activeChat?.firstPerson ? Sender.FirstPerson : Sender.SecondPerson;
 
   const { data, isLoading, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } =
-    useMessagesQuery(chat?.id || null);
+    useMessagesQuery(activeChat?.id || null);
 
   // this will put the scroll to bottom at start
   useEffect(() => {
     if (!isLoading) {
       scrollApiRef.current?.scrollToBottom();
     }
-  }, [chat, isLoading]);
+  }, [activeChat, isLoading]);
 
-  const createMsgMutation = useCreateMsgMutaton(chat?.id || 1);
+  const { addNewChat } = useChatApi();
+
+  const createMsgMutation = useCreateMsgMutaton(activeChat?.id || 1);
+  const createChatMutation = useCreateChatMutaton();
 
   const handleCreateMessage = (text: string) => {
-    if (!chat) return;
+    if (!chatData) return;
     scrollApiRef.current?.scrollToBottom();
     setLoadingMsgs([...loadingMsgs, text]);
-    createMsgMutation.mutate(
-      { body: text, chatId: chat.id },
-      {
-        onSuccess: () => {
-          setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
+
+    if (!activeChat && secondPerson) {
+      console.log('acTsec', activeChat, secondPerson);
+
+      createChatMutation.mutate(
+        {
+          name: '',
+          secondPersonTId: secondPerson.tId,
+          revealGender: false,
         },
-      },
-    );
+        {
+          onSuccess: (chat) => {
+            console.log('messag muta');
+
+            createMsgMutation.mutate(
+              { body: text, chatId: chat.id },
+              {
+                onSuccess: () => {
+                  addNewChat(chat);
+                  setChatData({ type: 'reg_chat', activeChatIndex: 0, activeChat: chat });
+                },
+              },
+            );
+          },
+        },
+      );
+    }
+
+    if (activeChat) {
+      createMsgMutation.mutate(
+        { body: text, chatId: activeChat.id },
+        {
+          onSuccess: () => {
+            setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
+          },
+        },
+      );
+    }
   };
 
   useEffect(() => {
@@ -105,7 +143,7 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
         gridTemplateRows: 'max-content 1fr max-content',
         flexBasis: '100%',
         borderLeft: `1px solid ${theme.colors.gray[4]}`,
-        [`@media (max-width: ${theme.breakpoints.md}px)`]: chat
+        [`@media (max-width: ${theme.breakpoints.md}px)`]: activeChat
           ? { borderLeft: 'none' }
           : { display: 'none' },
       })}
@@ -129,13 +167,13 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
         >
           {isFetchingPreviousPage && <Loader size="sm" />}
         </Box>
-        {chat &&
+        {activeChat &&
           data?.pages.map((msgs, indexA) => (
             <React.Fragment key={'msgBody-' + indexA}>
               {msgs?.map((msg, indexB) => (
                 <MessageBubble
-                  chatId={chat.id}
-                  chatIndex={chatIndex}
+                  chatId={activeChat.id}
+                  chatIndex={activeChatIndex ?? -1} // don't use || cuz, value can be 0
                   key={msg.id}
                   sender={sender}
                   indices={[indexA, indexB]}
@@ -148,7 +186,7 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
           <LoadingChatBubble key={text} text={text} />
         ))}
       </ChatScrollArea>
-      {chat && <ChatInput onSubmit={handleCreateMessage} />}
+      {chatData && <ChatInput onSubmit={handleCreateMessage} />}
     </Box>
   );
 };
