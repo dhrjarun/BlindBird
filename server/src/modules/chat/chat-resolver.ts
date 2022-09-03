@@ -3,6 +3,7 @@ import Chat from '../../entity/Chat'
 import User from '../../entity/User'
 import dataSource from '../../data-source'
 import { Sender } from '../../entity/Message'
+import { UserInputError } from 'apollo-server-core'
 
 @Resolver()
 export class ChatResolver {
@@ -12,7 +13,8 @@ export class ChatResolver {
     @Ctx() context: MyCtx,
     @Arg('name') name: string,
     @Arg('secondPersonTId') secondPersonTId: string,
-    @Arg('revealGender', () => Boolean) revealGender = false,
+    @Arg('revealGender', () => Boolean, { defaultValue: false })
+    revealGender = false,
   ): Promise<Chat> {
     const firstPerson = new User()
     firstPerson.id = context.req.user!.id
@@ -25,7 +27,7 @@ export class ChatResolver {
       .getOne()
 
     if (!secondPerson)
-      return Promise.reject('secondPerson is not in the database')
+      throw new UserInputError('secondPerson is not in the database')
 
     const chat = new Chat()
     chat.name = name
@@ -34,10 +36,20 @@ export class ChatResolver {
     chat.secondPerson = secondPerson
 
     await dataSource.manager.save(chat)
-    return chat
+
+    return (await dataSource
+      .createQueryBuilder(Chat, 'chat')
+      .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
+      .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
+      .where('firstPerson.id = :fPId AND secondPerson.id = :sPId', {
+        fPId: firstPerson.id,
+        sPId: secondPerson.id,
+      })
+      .select(['chat', 'firstPerson', 'secondPerson'])
+      .getOne()) as Chat
   }
 
-  @Query((returns) => [Chat], { nullable: true })
+  @Query(() => [Chat], { nullable: true })
   @Authorized()
   async chats(@Ctx() context: MyCtx) {
     return await dataSource
@@ -50,14 +62,15 @@ export class ChatResolver {
       .getMany()
   }
 
-  @Query((returns) => Chat, { nullable: true })
+  @Query(() => Chat, { nullable: true })
   @Authorized()
   async chat(
-    @Arg('id', { nullable: true }) id: number,
-    @Arg('secondPersonId', { nullable: true }) secondPersonId: number,
+    @Arg('id', () => Number, { nullable: true }) id: number | null,
+    @Arg('secondPersonTId', () => String, { nullable: true })
+    secondPersonTId: string | null,
     @Ctx() context: MyCtx,
   ): Promise<Chat | null> {
-    if (!id && !secondPersonId) return null
+    if (!id && !secondPersonTId) return null
 
     if (id) {
       return await dataSource
@@ -80,10 +93,10 @@ export class ChatResolver {
       .leftJoinAndSelect('chat.firstPerson', 'firstPerson')
       .leftJoinAndSelect('chat.secondPerson', 'secondPerson')
       .where(
-        'chat.firstPerson.id = :userId AND chat.secondPerson.id = :secondPersonId',
+        'firstPerson.id = :userId AND secondPerson.tId = :secondPersonTId',
         {
           userId: context.req.user?.id,
-          secondPersonId,
+          secondPersonTId: secondPersonTId,
         },
       )
       .select(['chat', 'firstPerson', 'secondPerson'])
@@ -91,7 +104,7 @@ export class ChatResolver {
   }
 
   @Authorized()
-  @Query((returns) => [Chat], { nullable: true })
+  @Query(() => [Chat], { nullable: true })
   async chatsWithUnreadMsgs(@Ctx() context: MyCtx): Promise<Chat[]> {
     return await dataSource
       .createQueryBuilder(Chat, 'chat')
@@ -113,7 +126,7 @@ export class ChatResolver {
   }
 
   @Authorized()
-  @Query((returns) => Chat, { nullable: true })
+  @Query(() => Chat, { nullable: true })
   async chatWithUnreadMsgs(
     @Arg('id') id: number,
     @Ctx() context: MyCtx,

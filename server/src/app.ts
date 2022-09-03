@@ -121,6 +121,8 @@ async function main() {
     formatError: (err) => {
       if (err.originalError instanceof ApolloError) return err
 
+      console.log('unexpected error', err)
+
       return new ApolloError(
         'Something unexpected happened',
         'INTERNAL_SERVER_ERROR',
