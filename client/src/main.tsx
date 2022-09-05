@@ -1,3 +1,4 @@
+import { NotificationsProvider } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ChatProvider } from 'chat';
@@ -22,7 +23,9 @@ ReactDOM.render(
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <ChatProvider>
-          <App />
+          <NotificationsProvider position="top-right">
+            <App />
+          </NotificationsProvider>
           <ReactQueryDevtools />
         </ChatProvider>
       </UserProvider>

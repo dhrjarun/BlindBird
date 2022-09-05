@@ -1,9 +1,9 @@
-import { subscriptionClient } from 'gql-client';
 import { NewMessageSubscription } from 'graphql/generated';
 import { gql } from 'graphql-request';
 import { ExecutionResult } from 'graphql-ws';
 import { useEffect } from 'react';
 import { useUserCtx } from 'user';
+import { subscriptionClient } from 'ws-client';
 
 import { useChatApi } from './use-chat-api';
 
@@ -45,13 +45,14 @@ export const useNewMsgSubscription = ({
       },
       {
         next: async (value) => {
-          if (onNext) onNext(value);
           const newMessage = value.data?.newMessage;
           const chatId = newMessage?.chatId;
           if (!chatId || !newMessage) return;
 
           addMsgInMessagesIfExist(chatId, newMessage);
           addMessageInChat(chatId, newMessage);
+
+          if (onNext) onNext(value);
         },
         error: (err) => {
           error = err;

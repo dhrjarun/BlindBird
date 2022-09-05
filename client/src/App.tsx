@@ -1,5 +1,6 @@
 import { Box } from '@mantine/core';
-import { Chat, useChatsWithUnreadMsgsQuery, useNewMsgSubscription } from 'chat';
+import { Chat, OnNext, useChatsWithUnreadMsgsQuery, useNewMsgSubscription } from 'chat';
+import { useNewMsgNotification } from 'chat/api/hooks/use-new-msg-notification';
 import { CHAT_PLACE, HOME, TWT_PROFILES } from 'constants/routes';
 import { LandingPage } from 'landing-page';
 import { ProtectedRoute } from 'protected-route';
@@ -10,7 +11,15 @@ import { UserProfile } from 'user-profile';
 
 function App() {
   useChatsWithUnreadMsgsQuery();
-  useNewMsgSubscription();
+  const { newMsg } = useNewMsgNotification();
+
+  const onNext: OnNext = (value) => {
+    if (value.data?.newMessage) {
+      newMsg(value.data.newMessage);
+    }
+  };
+
+  useNewMsgSubscription({ onNext });
 
   const { isLoading } = useUserCtx();
 
