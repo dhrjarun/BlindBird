@@ -24,6 +24,7 @@ module.exports = {
     amd: true,
     node: true,
     jest: true,
+    'cypress/globals': true,
   },
   extends: [
     'eslint:recommended',
@@ -31,8 +32,9 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:prettier/recommended', // Make sure this is always the last element in the array.
+    'plugin:cypress/recommended',
   ],
-  plugins: ['simple-import-sort', 'prettier'],
+  plugins: ['simple-import-sort', 'prettier', 'cypress'],
   rules: {
     'prettier/prettier': ['error', {}, { usePrettierrc: true }],
     'react/react-in-jsx-scope': 'off',
@@ -49,5 +51,11 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
+    'cypress/no-assigning-return-values': 'error',
+    'cypress/no-unnecessary-waiting': 'error',
+    'cypress/assertion-before-screenshot': 'warn',
+    'cypress/no-force': 'warn',
+    'cypress/no-async-tests': 'error',
+    'cypress/no-pause': 'error',
   },
 };

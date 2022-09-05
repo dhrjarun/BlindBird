@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "Node", "jest"],
+    "types": ["vite/client", "Node", "jest", "cypress"],
     "baseUrl": "src",
     "allowJs": false,
     "skipLibCheck": false,
@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["./src"],
+  "include": ["./src", "mocks", "cypress"],
   "exclude": ["node_modules"]
 }
