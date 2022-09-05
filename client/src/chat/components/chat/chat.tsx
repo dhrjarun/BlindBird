@@ -1,6 +1,6 @@
 import { Box, Container } from '@mantine/core';
 import { useChatCtx } from 'chat/api';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { ChatFeed } from '../chat-feed';
 import { ChatAside } from '../chats-aside';
@@ -8,7 +8,14 @@ import { PrimaryHeader } from './primary-header';
 import { SidebarHeader } from './sidebar-header';
 
 export function Chat() {
-  const { chatData } = useChatCtx();
+  const { chatData, setChatData } = useChatCtx();
+
+  // for removing active chat after the unmount of chat component
+  useEffect(() => {
+    return () => {
+      setChatData(null);
+    };
+  }, []);
 
   return (
     <Box>

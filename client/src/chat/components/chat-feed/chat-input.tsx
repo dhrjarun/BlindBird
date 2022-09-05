@@ -37,13 +37,19 @@ export const ChatInput = React.forwardRef<HTMLDivElement, ChatInputProps>(
               {...rest}
             >
               <Field
+                className="message-input"
                 name="message"
                 as={Textarea}
                 sx={() => ({ flexBasis: '100%' })}
                 autosize
                 placeholder="What's in your mind?"
               />
-              <Button type="submit" disabled={isSubmitting} size="xs">
+              <Button
+                className="message-submit-btn"
+                type="submit"
+                disabled={isSubmitting}
+                size="xs"
+              >
                 Send
               </Button>
             </Box>

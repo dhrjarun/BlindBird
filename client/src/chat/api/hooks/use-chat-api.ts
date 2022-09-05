@@ -26,6 +26,7 @@ export const useChatApi = () => {
 
   const getChatWithIndex = (id: number) => {
     const chats = getChatsWithUnreadMsg() || [];
+
     let chatIndex = -1;
 
     const chat = chats.find((chat, index) => {
@@ -102,6 +103,31 @@ export const useChatApi = () => {
     );
   };
 
+  const updateChat = (chatId: number, chat: Chat) => {
+    queryClient.setQueriesData<ChatsWithUnreadMsgs>(
+      chatKeys.chatsWithUnreadMsg,
+      (data) => {
+        const newData = produce(data, (draft) => {
+          if (!draft) return;
+
+          const index = draft.findIndex((chat) => chat.id === chatId);
+          draft[index] = chat;
+        });
+        return newData;
+      },
+    );
+  };
+
+  const removeChat = (chatId: number) => {
+    queryClient.setQueriesData<ChatsWithUnreadMsgs>(
+      chatKeys.chatsWithUnreadMsg,
+      (data) => {
+        if (!data) return data;
+        return data.filter((chat) => chat.id !== chatId);
+      },
+    );
+  };
+
   const makeMessageToRead = (chatId: number, msgIndices: [number, number]) => {
     queryClient.setQueryData<InfiniteData<Message[]>>(
       chatKeys.messages(chatId),
@@ -125,5 +151,7 @@ export const useChatApi = () => {
     addNewChat,
     getChatWithIndex,
     getChatIndex,
+    updateChat,
+    removeChat,
   };
 };

@@ -15,12 +15,10 @@ import {
 } from 'graphql/generated';
 import { gql } from 'graphql-request';
 
-export type FetchChat = (
+export const fetchChat = async (
   chatId: number | null,
-  secondPersonId: string | null,
-) => Chat | null;
-
-export const fetchChat: FetchChat = async (chatId, secondPersonTId = null) => {
+  secondPersonTId: string | null = null,
+) => {
   const fromIdQuery = gql`
     query ChatFromId($chatId: Float) {
       chat(id: $chatId) {
@@ -77,13 +75,16 @@ export const fetchChat: FetchChat = async (chatId, secondPersonTId = null) => {
     return chat || null;
   }
 
-  const { chat } = await gqlClient.request<
-    ChatFromSecondPersonTIdQuery,
-    ChatFromSecondPersonTIdQueryVariables
-  >(fromSecondPersonTIdQuery, { secondPersonTId });
-
-  return chat;
+  if (secondPersonTId) {
+    const { chat } = await gqlClient.request<
+      ChatFromSecondPersonTIdQuery,
+      ChatFromSecondPersonTIdQueryVariables
+    >(fromSecondPersonTIdQuery, { secondPersonTId });
+    return chat || null;
+  }
 };
+
+export type FetchChat = typeof fetchChat;
 
 export type FetchChatWithUnreadMsgs = (
   chatId: number,

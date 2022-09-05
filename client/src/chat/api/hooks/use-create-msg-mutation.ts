@@ -4,6 +4,7 @@ import {
   CreateMessageDocument,
   CreateMessageMutation,
   CreateMessageMutationVariables,
+  Message,
 } from 'graphql/generated';
 
 import { useChatApi } from './use-chat-api';
@@ -28,7 +29,7 @@ export const useCreateMsgMutaton = (chatId: number | null) => {
 
   return useMutation(createMessgeRequest, {
     onSuccess: (message) => {
-      if (chatId) {
+      if (chatId && message) {
         chatApi.addMsgInMessagesIfExist(chatId, message);
       }
     },

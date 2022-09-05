@@ -7,16 +7,10 @@ import { getDisplayNameAndPfp } from '../../utils';
 
 export interface HeaderProps {}
 export const Header = React.forwardRef<HTMLHeadElement, HeaderProps>((props, ref) => {
-  const {
-    data: { activeChat, secondPerson },
-    chatData,
-    setChatData,
-  } = useChatCtx();
+  const { chatData, setChatData } = useChatCtx();
   if (!chatData) return null;
 
-  const { name, pfp } = activeChat
-    ? getDisplayNameAndPfp(activeChat)
-    : { name: secondPerson?.tName, pfp: secondPerson?.tPfp };
+  const { name, pfp } = getDisplayNameAndPfp(chatData.activeChat);
 
   const handleBackClick = () => {
     setChatData(null);

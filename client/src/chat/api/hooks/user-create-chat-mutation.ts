@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { update } from 'cypress/types/lodash';
 import { gqlClient } from 'gql-client';
 import {
   CreateChatDocument,
@@ -9,7 +10,7 @@ import {
 import { useChatApi } from './use-chat-api';
 
 export const useCreateChatMutaton = () => {
-  const { addNewChat } = useChatApi();
+  const { updateChat } = useChatApi();
 
   const createChatRequest = async ({
     secondPersonTId,
@@ -30,7 +31,7 @@ export const useCreateChatMutaton = () => {
 
   return useMutation(createChatRequest, {
     onSuccess: (chat) => {
-      addNewChat(chat);
+      updateChat(-1, chat);
     },
   });
 };

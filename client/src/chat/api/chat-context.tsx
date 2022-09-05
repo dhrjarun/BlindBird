@@ -1,51 +1,24 @@
-import { Chat, User } from 'graphql/generated';
-import React, { useState } from 'react';
+import { Chat } from 'graphql/generated';
+import React, { createContext, useState } from 'react';
 
-export type RegChatData = {
-  type: 'reg_chat';
+export type ChatData = {
+  type: 'reg' | 'new';
   activeChat: Chat;
   activeChatIndex: number;
 };
 
-export type NewChatData = {
-  type: 'new_chat';
-  secondPerson: User;
-};
-
-export type ChatData = RegChatData | NewChatData | null;
-
-export type Data = {
-  activeChat: Chat | null;
-  activeChatIndex: number | null;
-  secondPerson: User | null;
-};
-
 export interface ChatContextProps {
-  chatData: ChatData;
-  setChatData: React.Dispatch<React.SetStateAction<ChatData>>;
-  data: Data;
+  chatData: ChatData | null;
+  setChatData: React.Dispatch<React.SetStateAction<ChatData | null>>;
 }
 
-export const ChatContext = React.createContext<ChatContextProps>({} as ChatContextProps);
+export const ChatContext = createContext<ChatContextProps>({} as ChatContextProps);
 
 export const ChatProvider: React.FC = ({ children }) => {
-  const [chatData, setChatData] = useState<ChatData>(null);
-
-  const data: Data = {
-    activeChat: null,
-    activeChatIndex: null,
-    secondPerson: null,
-  };
-
-  if (chatData?.type === 'reg_chat') {
-    data.activeChat = chatData.activeChat;
-    data.activeChatIndex = chatData.activeChatIndex;
-  } else if (chatData?.type === 'new_chat') {
-    data.secondPerson = chatData.secondPerson;
-  }
+  const [chatData, setChatData] = useState<ChatData | null>(null);
 
   return (
-    <ChatContext.Provider value={{ chatData, setChatData, data }}>
+    <ChatContext.Provider value={{ chatData, setChatData }}>
       {children}
     </ChatContext.Provider>
   );

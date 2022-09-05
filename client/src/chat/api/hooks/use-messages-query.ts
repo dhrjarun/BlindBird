@@ -20,7 +20,7 @@ export const useMessagesQuery = (chatId: number | null) => {
         CursorType: pageParam?.cursorType,
       });
 
-      return messages.reverse();
+      return messages?.reverse();
     },
     [chatId],
   );

@@ -21,11 +21,8 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
     loadingMsgsLength: number;
   }>();
 
-  const {
-    data: { activeChat, activeChatIndex, secondPerson },
-    chatData,
-    setChatData,
-  } = useChatCtx();
+  const { chatData, setChatData } = useChatCtx();
+  const { activeChat, activeChatIndex, type: chatType } = chatData || {};
 
   const [loadingMsgs, setLoadingMsgs] = useState<string[]>([]);
 
@@ -34,6 +31,18 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
   const { data, isLoading, fetchPreviousPage, isFetchingPreviousPage, hasPreviousPage } =
     useMessagesQuery(activeChat?.id || null);
 
+  const { removeChat } = useChatApi();
+
+  useEffect(() => {
+    const data = chatData;
+
+    return () => {
+      if (data && data.type === 'new') {
+        removeChat(data.activeChat.id);
+      }
+    };
+  }, [chatData]);
+
   // this will put the scroll to bottom at start
   useEffect(() => {
     if (!isLoading) {
@@ -41,53 +50,49 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({ ...rest }) => {
     }
   }, [activeChat, isLoading]);
 
-  const { addNewChat } = useChatApi();
-
   const createMsgMutation = useCreateMsgMutaton(activeChat?.id || 1);
   const createChatMutation = useCreateChatMutaton();
 
-  const handleCreateMessage = (text: string) => {
-    if (!chatData) return;
+  const handleCreateMessage = async (text: string) => {
+    if (!activeChat) return;
+
     scrollApiRef.current?.scrollToBottom();
     setLoadingMsgs([...loadingMsgs, text]);
 
-    if (!activeChat && secondPerson) {
-      console.log('acTsec', activeChat, secondPerson);
-
-      createChatMutation.mutate(
+    if (chatType === 'new') {
+      await createChatMutation.mutateAsync(
         {
-          name: '',
-          secondPersonTId: secondPerson.tId,
-          revealGender: false,
+          name: activeChat.name,
+          secondPersonTId: activeChat.secondPerson.tId,
+          revealGender: activeChat.revealGender,
         },
         {
           onSuccess: (chat) => {
-            console.log('messag muta');
+            setChatData({ type: 'reg', activeChatIndex: 0, activeChat: chat });
 
             createMsgMutation.mutate(
               { body: text, chatId: chat.id },
               {
                 onSuccess: () => {
-                  addNewChat(chat);
-                  setChatData({ type: 'reg_chat', activeChatIndex: 0, activeChat: chat });
+                  setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
                 },
               },
             );
           },
         },
       );
+
+      return;
     }
 
-    if (activeChat) {
-      createMsgMutation.mutate(
-        { body: text, chatId: activeChat.id },
-        {
-          onSuccess: () => {
-            setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
-          },
+    createMsgMutation.mutate(
+      { body: text, chatId: activeChat.id },
+      {
+        onSuccess: () => {
+          setLoadingMsgs(loadingMsgs.filter((itemText) => text !== itemText));
         },
-      );
-    }
+      },
+    );
   };
 
   useEffect(() => {

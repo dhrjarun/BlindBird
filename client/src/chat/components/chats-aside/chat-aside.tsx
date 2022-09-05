@@ -11,32 +11,22 @@ export const ChatAside = React.forwardRef<HTMLDivElement, ChatAsideProps>(
   ({ ...rest }, ref) => {
     const { data: chats, isLoading, isError } = useChatsWithUnreadMsgsQuery();
 
-    const {
-      data: { activeChat, secondPerson },
-      setChatData,
-    } = useChatCtx();
+    const { chatData, setChatData } = useChatCtx();
 
-    if (isLoading || !chats)
-      return <ScrollArea {...getScrollAreaProps(rest)}>loading</ScrollArea>;
+    if (isLoading) return <ScrollArea {...getScrollAreaProps(rest)}>loading</ScrollArea>;
     if (isError) return <ScrollArea {...getScrollAreaProps(rest)}>error</ScrollArea>;
 
     return (
-      <ScrollArea viewportRef={ref} {...getScrollAreaProps(rest)}>
-        {secondPerson && (
-          <Item
-            data={{ name: secondPerson.tName, pfp: secondPerson.tPfp }}
-            isActive={true}
-          />
-        )}
+      <ScrollArea className="chat-items" viewportRef={ref} {...getScrollAreaProps(rest)}>
         {chats?.map((chat, index) => (
           <Item
             chat={chat as Chat}
             data={getDisplayNameAndPfp(chat as Chat)}
-            isActive={chat.id === activeChat?.id}
+            isActive={chat.id === chatData?.activeChat.id}
             key={chat.id}
             onClick={() => {
               setChatData({
-                type: 'reg_chat',
+                type: 'reg',
                 activeChat: chat as Chat,
                 activeChatIndex: index,
               });

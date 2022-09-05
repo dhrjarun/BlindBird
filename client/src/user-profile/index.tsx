@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchChat, useChatApi, useChatCtx } from 'chat';
 import { CHAT_PLACE } from 'constants/routes';
 import { gqlClient } from 'gql-client';
-import { Chat, UserDocument, UserQuery } from 'graphql/generated';
+import { Chat, User, UserDocument, UserQuery } from 'graphql/generated';
 import { Logo } from 'logo';
 import React from 'react';
 import { Info } from 'react-feather';
@@ -29,6 +29,7 @@ export function UserProfile() {
   };
 
   const { data, isLoading, isError } = useQuery(['user', username], fetchUser, {});
+  const { addNewChat } = useChatApi();
 
   const handleChatClick = async () => {
     if (data) {
@@ -38,12 +39,27 @@ export function UserProfile() {
         const { chat, chatIndex } = getChatWithIndex(_chat.id);
 
         setChatData({
-          type: 'reg_chat',
+          type: 'reg',
           activeChat: chat as Chat,
           activeChatIndex: chatIndex,
         });
       } else {
-        setChatData({ type: 'new_chat', secondPerson: data });
+        const chat: Chat = {
+          name: '',
+          revealGender: false,
+          id: -1,
+          firstPerson: user,
+          secondPerson: data as User,
+          createAt: Date.now().toString(),
+        };
+
+        addNewChat(chat);
+
+        setChatData({
+          type: 'new',
+          activeChat: chat,
+          activeChatIndex: 0,
+        });
       }
       navigate(CHAT_PLACE);
     }

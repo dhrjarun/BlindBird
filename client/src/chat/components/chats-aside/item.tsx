@@ -11,6 +11,7 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>(
   ({ chat, data, isActive, ...rest }, ref) => {
     return (
       <Group
+        className="chat-item"
         position="apart"
         sx={(theme) => ({
           paddingInline: theme.spacing.sm,

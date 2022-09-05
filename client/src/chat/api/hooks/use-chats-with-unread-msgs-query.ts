@@ -9,6 +9,7 @@ export const useChatsWithUnreadMsgsQuery = () => {
     const { chatsWithUnreadMsgs } = await gqlClient.request<ChatsWithUnreadMsgsQuery>(
       ChatsWithUnreadMsgsDocument,
     );
+
     return chatsWithUnreadMsgs;
   });
 
