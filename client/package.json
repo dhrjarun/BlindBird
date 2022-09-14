@@ -18,7 +18,6 @@
     "jest": "jest",
     "cypress:open": "cypress open",
     "jest:watch": "jest --watch",
-    "prebuild": "yarn generate",
     "prestart": "yarn generate"
   },
   "dependencies": {
