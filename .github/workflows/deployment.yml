@@ -6,9 +6,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
   
 jobs:
   build:
@@ -16,6 +13,7 @@ jobs:
     steps:
       - name: setting up enviroment
       - uses: actions/checkout@v2
+      - run: ls
       - uses: actions/setup-node@v1
         with:
           node-version: "16.15.0"
@@ -42,7 +40,12 @@ jobs:
           name: client-dist
       - name: Deploy to GitHub Pages
       - id: deployment
-      - uses: actions/deploy-pages@v1
+      - uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: gh-pages
+          build_dir: ./dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        
           
             
