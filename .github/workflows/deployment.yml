@@ -1,4 +1,3 @@
-# This is a basic workflow to help you get started with Actions
 name: Client deployment workflow
 
 on:
@@ -12,16 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: setting up enviroment
-      - uses: actions/checkout@v2
-      - run: ls
-      - uses: actions/setup-node@v1
+        uses: actions/checkout@v2
+      - name: listing files
+        run: ls
+      - name: settin up node
+        uses: actions/setup-node@v1
         with:
           node-version: "16.15.0"
+      - name: go to client directory
+        run: cd ./client
       - name: install dependencies
-      - run: cd ./client
-      - run: yarn install
+        run: yarn install
       - name: build client package
-      - run: yarn build
+        run: yarn build
       - name: Upload dist artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -39,8 +41,7 @@ jobs:
         with:
           name: client-dist
       - name: Deploy to GitHub Pages
-      - id: deployment
-      - uses: crazy-max/ghaction-github-pages@v3
+        uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
           build_dir: ./dist
