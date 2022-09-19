@@ -23,7 +23,7 @@ jobs:
       - name: build client package
         run: cd ./client && yarn build
       - name: Upload dist artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v3.0.0
         with:
           name: client-dist
           path: ./client/dist
