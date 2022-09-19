@@ -18,12 +18,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.15.0"
-      - name: go to client directory
-        run: cd ./client
       - name: install dependencies
-        run: yarn install
+        run: cd ./client && yarn install
       - name: build client package
-        run: yarn build
+        run: cd ./client && yarn build
       - name: Upload dist artifact
         uses: actions/upload-pages-artifact@v1
         with:
