@@ -1,0 +1,41 @@
+# This is a basic workflow to help you get started with Actions
+
+name: server-build-create-image-publish
+
+on:
+  release:
+    types: [published]
+    
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.pkg.github.com 
+  REPO: DhrjArun/blind-bird-server
+  CONTAINER: blind-bird-server
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.15.0"
+      - name: install dependencies
+        run: cd ./server && yarn install
+      - name: build client package
+        run: cd ./client && yarn build
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          repository: ${{ env.REPO }}
+          tag_with_ref: true
+          context: ./server
