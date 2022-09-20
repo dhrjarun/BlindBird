@@ -88,7 +88,6 @@ async function main() {
       ChatResolver,
     ],
     // emitSchemaFile: resolve(__dirname, 'schema/schema.gql'),
-    emitSchemaFile: true,
     authChecker,
     authMode: 'null',
   })
