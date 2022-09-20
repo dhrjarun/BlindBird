@@ -38,4 +38,4 @@ jobs:
           registry: ${{ env.REGISTRY }}
           repository: ${{ env.REPO }}
           tag_with_ref: true
-          context: ./server
+          context: "{{defaultContext}}:server"
