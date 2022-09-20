@@ -34,4 +34,4 @@ jobs:
         with:
           context: ./server
           push: true
-          tags: DhrjArun/blind-bird-server:latest
+          tags: dhrjarun/blind-bird-server:latest
