@@ -40,4 +40,4 @@ jobs:
         with:
           context: ./server
           push: true
-          tags: dhrjarun/blind-bird-server:latest
+          tags: ghcr.io/dhrjarun/blind-bird-server:latest
