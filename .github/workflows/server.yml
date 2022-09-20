@@ -25,6 +25,8 @@ jobs:
         run: cd ./server && yarn install
       - name: build server package
         run: cd ./server && yarn build
+      - name: list directory
+        run: ls -R
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Build and push
