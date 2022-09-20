@@ -28,9 +28,9 @@ jobs:
           node-version: "16.15.0"
       - name: install dependencies
         run: cd ./server && yarn install
-      - name: build client package
-        run: cd ./client && yarn build
-      - name: Push to GitHub Packages
+      - name: build server package
+        run: cd ./server && yarn build
+      - name: Build and push the image to GitHub Packages
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
