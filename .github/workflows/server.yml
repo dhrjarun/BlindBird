@@ -8,11 +8,6 @@ on:
     
   workflow_dispatch:
 
-env:
-  REGISTRY: docker.pkg.github.com 
-  REPO: DhrjArun/blind-bird-server
-  CONTAINER: blind-bird-server
-
 
 jobs:
   build:
@@ -33,9 +28,6 @@ jobs:
       - name: Build and push the image to GitHub Packages
         uses: docker/build-push-action@v3
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ${{ env.REGISTRY }}
-          repository: ${{ env.REPO }}
-          tag_with_ref: true
+          push: true
+          tags: user/app:latest
           context: "{{defaultContext}}:server"
