@@ -9,8 +9,6 @@ const requiredEnv: string[] = [
   'DB_PWD',
   'REDIS_PORT',
   'REDIS_HOST',
-  'REDIS_PWD',
-  'REDIS_USERNAME',
   'TWT_API_KEY',
   'TWT_API_KEY_SECRET',
 ]
