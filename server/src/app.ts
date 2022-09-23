@@ -64,6 +64,7 @@ async function main() {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 365 * 7, // 7 years
     },
   })
@@ -73,7 +74,7 @@ async function main() {
 
   app.use(
     cors({
-      origin: 'http://localhost:3000',
+      origin: ['https://blindbird.online', 'http://localhost:3000'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       exposedHeaders: ['set-cookies', 'connection'],
