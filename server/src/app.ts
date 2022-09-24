@@ -66,7 +66,8 @@ async function main() {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      domain:
+        process.env.NODE_ENV === 'production' ? 'blindbird.online' : undefined,
       maxAge: 1000 * 60 * 60 * 24 * 365 * 7, // 7 years
     },
   }
