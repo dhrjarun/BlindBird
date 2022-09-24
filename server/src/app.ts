@@ -36,6 +36,8 @@ import cors from 'cors'
 import { Context, SubscribeMessage } from 'graphql-ws'
 import { ExecutionArgs } from 'graphql'
 
+console.log(`Enviroment: ${process.env.NODE_ENV}`)
+
 export const authChecker: AuthChecker<MyCtx> = async (
   { root, args, context, info },
   roles,
@@ -55,7 +57,7 @@ async function main() {
   redisBoot()
 
   const RedisStore = connectRedis(session)
-  const sessionParser = session({
+  const sessionOpts: session.SessionOptions = {
     store: new RedisStore({ client: redis }),
     name: config.get<string>('session_name'),
     secret: process.env.SESSION_SECRET as string,
@@ -67,19 +69,23 @@ async function main() {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 365 * 7, // 7 years
     },
-  })
+  }
+
+  console.log(`cookieOpts in session: ${JSON.stringify(sessionOpts.cookie)}`)
+
+  const sessionParser = session(sessionOpts)
 
   const app = express()
   const httpServer = http.createServer(app)
 
-  app.use(
-    cors({
-      origin: ['https://blindbird.online', 'http://localhost:3000'],
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      exposedHeaders: ['set-cookies', 'connection'],
-    }),
-  )
+  const corsOpts: cors.CorsOptions = {
+    origin: ['https://blindbird.online', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    exposedHeaders: ['set-cookies', 'connection'],
+  }
+  console.log(`cors options: ${JSON.stringify(corsOpts)}`)
+  app.use(cors(corsOpts))
 
   const schema = await buildSchema({
     resolvers: [
@@ -170,7 +176,7 @@ async function main() {
     wsServer,
   )
 
-  app.set('trust proxy', process.env.NODE_ENV !== 'production') // because cookie is not getting stored in the browser
+  app.set('trust proxy', true)
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
