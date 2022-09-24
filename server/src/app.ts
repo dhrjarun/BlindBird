@@ -65,7 +65,7 @@ async function main() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? true : false,
+      // secure: process.env.NODE_ENV === 'production' ? true : false,
       maxAge: 1000 * 60 * 60 * 24 * 365 * 7, // 7 years
     },
   }
@@ -175,7 +175,7 @@ async function main() {
     wsServer,
   )
 
-  app.set('trust proxy', true)
+  app.set('trust proxy', 1)
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
