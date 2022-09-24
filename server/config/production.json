@@ -1,5 +1,5 @@
 {
-  "twt_callback_url": "http://api.blindbird.online/auth/twitter/callback",
+  "twt_callback_url": "https://api.blindbird.online/auth/twitter/callback",
   "twt_success_url": "https://blindbird.online",
   "twt_failed_url": "https://blindbird.online",
   "client_url": "https://blindbird.online"
