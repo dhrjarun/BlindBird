@@ -1,9 +1,9 @@
 import { isDevEnv } from './isDevEnv';
 
 export const DEV_SERVER_BASE_URL = 'http://localhost:3100';
-export const PROD_SERVER_BASE_URL = 'http://api.blindbird.online';
+export const PROD_SERVER_BASE_URL = 'https://api.blindbird.online';
 export const DEV_SERVER_WS_URL = 'ws://localhost:3100';
-export const PROD_SERVER_WS_URL = 'ws://api.blindbird.online';
+export const PROD_SERVER_WS_URL = 'wss://api.blindbird.online';
 
 export const TWT_REGISTER = isDevEnv()
   ? `${DEV_SERVER_BASE_URL}/auth/twitter`
