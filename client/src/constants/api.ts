@@ -12,8 +12,8 @@ export const GQL_URL = isDevEnv()
   ? `${DEV_SERVER_BASE_URL}/graphql`
   : `${PROD_SERVER_BASE_URL}/graphql`;
 export const GQL_WS_URL = isDevEnv()
-  ? `${DEV_SERVER_WS_URL}/graphql`
-  : `${PROD_SERVER_WS_URL}/graphql`;
+  ? `${DEV_SERVER_WS_URL}/subs`
+  : `${PROD_SERVER_WS_URL}/subs`;
 export const LOGOUT_URL = isDevEnv()
   ? `${DEV_SERVER_BASE_URL}/logout`
   : `${PROD_SERVER_BASE_URL}/logout`;

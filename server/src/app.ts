@@ -138,7 +138,7 @@ async function main() {
 
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/graphql',
+    path: '/subs',
   })
 
   const getDynamicContext = (
